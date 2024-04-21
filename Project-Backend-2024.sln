@@ -3,13 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project-Backend-2024", "Project-Backend-2024\Project-Backend-2024.csproj", "{3D6B63EB-4A17-4B95-A3ED-5DFA0D9033BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project-Backend-2024", "Project-Backend-2024\Project-Backend-2024.csproj", "{3D6B63EB-4A17-4B95-A3ED-5DFA0D9033BA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{A2F0B9F6-A603-4273-9EF0-1C946FD0BEE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project-Backend-2024.Repositories", "Project-Backend-2024.Repositories\Project-Backend-2024.Repositories.csproj", "{44CA3B04-2BA6-47B5-BCC8-77DF35F0A177}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project-Backend-2024.Repositories", "Project-Backend-2024.Repositories\Project-Backend-2024.Repositories.csproj", "{44CA3B04-2BA6-47B5-BCC8-77DF35F0A177}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aggregation", "Aggregation", "{34E3A22D-39E1-4AC6-BC30-393ABB7DD775}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{BECE3F96-1716-4A5A-87CA-A257D45E5A91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project-Backend-2024.DTO", "Project-Backend-2024.DTO\Project-Backend-2024.DTO.csproj", "{948C4DFA-7CA0-4C6E-98BB-A9A879036066}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project-Backend-2024.Facade", "Project-Backend-2024.Facade\Project-Backend-2024.Facade.csproj", "{CAE96C84-4716-4AF1-91DA-BFFBABD41A41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +31,14 @@ Global
 		{44CA3B04-2BA6-47B5-BCC8-77DF35F0A177}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44CA3B04-2BA6-47B5-BCC8-77DF35F0A177}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44CA3B04-2BA6-47B5-BCC8-77DF35F0A177}.Release|Any CPU.Build.0 = Release|Any CPU
+		{948C4DFA-7CA0-4C6E-98BB-A9A879036066}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{948C4DFA-7CA0-4C6E-98BB-A9A879036066}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{948C4DFA-7CA0-4C6E-98BB-A9A879036066}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{948C4DFA-7CA0-4C6E-98BB-A9A879036066}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAE96C84-4716-4AF1-91DA-BFFBABD41A41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAE96C84-4716-4AF1-91DA-BFFBABD41A41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAE96C84-4716-4AF1-91DA-BFFBABD41A41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAE96C84-4716-4AF1-91DA-BFFBABD41A41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +46,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3D6B63EB-4A17-4B95-A3ED-5DFA0D9033BA} = {34E3A22D-39E1-4AC6-BC30-393ABB7DD775}
 		{44CA3B04-2BA6-47B5-BCC8-77DF35F0A177} = {A2F0B9F6-A603-4273-9EF0-1C946FD0BEE2}
+		{948C4DFA-7CA0-4C6E-98BB-A9A879036066} = {BECE3F96-1716-4A5A-87CA-A257D45E5A91}
+		{CAE96C84-4716-4AF1-91DA-BFFBABD41A41} = {BECE3F96-1716-4A5A-87CA-A257D45E5A91}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56D31CC0-7461-4AC4-89A9-7D41C9D6447C}
