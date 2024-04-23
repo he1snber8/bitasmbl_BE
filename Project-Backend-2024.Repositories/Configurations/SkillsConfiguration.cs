@@ -12,6 +12,9 @@ public class SkillsConfiguration : IEntityTypeConfiguration<Skill>
            .HasColumnType("varchar")
            .HasMaxLength(50)
            .IsRequired();
+
+        builder.HasIndex(u => u.Name)
+            .IsUnique();
     }
 
 }

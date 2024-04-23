@@ -13,6 +13,9 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasMaxLength(50)
             .IsRequired();
 
+        builder.HasIndex(p => p.Name)
+           .IsUnique();
+
         builder.Property(p => p.Description)
             .HasColumnType("nvarchar")
             .HasMaxLength(255)
@@ -21,7 +24,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.Status)
             .HasColumnType("varchar")
             .HasMaxLength(50)
-            .IsRequired();
+            .HasDefaultValueSql("'Active'");
 
         builder.Property(p => p.IsDeleted)
             .HasDefaultValue(false);
@@ -31,7 +34,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.HasOne(p => p.User)
-            .WithMany(u => u.Projects)
+            .WithMany(user => user.Projects)
             .HasForeignKey(p => p.PrincipalID)
             .IsRequired();
     }
