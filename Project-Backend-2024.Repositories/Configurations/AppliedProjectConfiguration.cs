@@ -13,7 +13,7 @@ internal class AppliedProjectConfiguration : IEntityTypeConfiguration<AppliedPro
         builder.Property(ap => ap.ApplicationStatus)
             .HasColumnType("varchar")
             .HasMaxLength(50)
-            .IsRequired();
+            .HasDefaultValueSql("'Active'");
 
         builder.Property(ap => ap.DateApplied)
             .HasColumnType("datetime");
