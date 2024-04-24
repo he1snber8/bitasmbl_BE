@@ -37,7 +37,7 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(c => c.DateJoined)
             .HasColumnType("datetime")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasDefaultValueSql("GETDATE()");
 
             builder.Property(c => c.LastLogin)
             .HasColumnType("datetime");
@@ -50,6 +50,10 @@ namespace Project_Backend_2024.Repositories.Configurations
             builder.HasMany(p => p.Projects)
                 .WithOne(u => u.User)
                 .HasForeignKey(u => u.PrincipalID);
+
+            builder.Property(m => m.Picture)
+           .HasColumnType("VARBINARY(MAX)")
+           .IsRequired(false);
 
         }
     }

@@ -7,8 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Project-Backend-2024.Facade\Project-Backend-2024.Facade.csproj" />
-  </ItemGroup>
-
 </Project>

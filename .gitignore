@@ -22,6 +22,9 @@ Properties/*
 # Ignore xunit startup file
 Startup.cs
 
+#ignore appsettings
+appsettings.Development.json
+
 # Ignore launch settings
 launchSettings.json
 

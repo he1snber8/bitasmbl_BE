@@ -10,8 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DatabaseConnector>(options =>
-        options.UseSqlite(@"Data Source=C:\Users\lukak\OneDrive\Desktop\Sqlite\Project.db") //connection string
+builder.Services.AddDbContext<DatabaseContext>(options =>
+        options.UseSqlServer("server = database-1.chk6gakouzh7.eu-central-1.rds.amazonaws.com,1433; User Id=admin;Password=meditations;Database = mydatabase;TrustServerCertificate  = true") //connection string
         );
 
 var app = builder.Build();

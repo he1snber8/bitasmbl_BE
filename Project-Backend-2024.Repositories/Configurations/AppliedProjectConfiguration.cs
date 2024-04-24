@@ -25,6 +25,7 @@ internal class AppliedProjectConfiguration : IEntityTypeConfiguration<AppliedPro
 
         builder.HasOne(ap => ap.User)
             .WithMany()
+            .OnDelete(DeleteBehavior.NoAction)
             .HasForeignKey(ap => ap.UserID)
             .IsRequired();
 

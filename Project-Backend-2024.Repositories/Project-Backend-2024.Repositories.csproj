@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Project-Backend-2024.DTO\Project-Backend-2024.DTO.csproj" />
+    <ProjectReference Include="..\Project-Backend-2024.Facade\Project-Backend-2024.Facade.csproj" />
   </ItemGroup>
 
 </Project>

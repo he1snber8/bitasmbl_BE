@@ -12,13 +12,15 @@ public class UserSkillsConfiguration : IEntityTypeConfiguration<UserSkills>
 
         builder.HasOne(ap => ap.User)
            .WithMany()
+           .OnDelete(DeleteBehavior.NoAction)
            .HasForeignKey(ap => ap.UserID)
            .IsRequired();
-
+           
         builder.HasOne(ap => ap.Skill)
             .WithMany()
             .HasForeignKey(ap => ap.SkillID)
             .IsRequired();
+
     }
 
 }
