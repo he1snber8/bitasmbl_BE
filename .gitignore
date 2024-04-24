@@ -23,7 +23,7 @@ Properties/*
 Startup.cs
 
 #ignore appsettings
-appsettings.Development.json
+appsettings.*
 
 # Ignore launch settings
 launchSettings.json
