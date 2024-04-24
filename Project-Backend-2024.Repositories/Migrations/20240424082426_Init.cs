@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Project_Backend_2024.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,9 +15,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "Skills",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "varchar", maxLength: 50, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,15 +28,15 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
-                    Username = table.Column<string>(type: "varchar", maxLength: 30, nullable: false),
-                    Password = table.Column<string>(type: "varbinary", maxLength: 35, nullable: false),
-                    Email = table.Column<string>(type: "varchar", maxLength: 50, nullable: false),
-                    Picture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    Bio = table.Column<string>(type: "NVARCHAR", maxLength: 255, nullable: true),
-                    DateJoined = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Username = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
+                    Password = table.Column<byte[]>(type: "varbinary(35)", maxLength: 35, nullable: false),
+                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Picture = table.Column<byte[]>(type: "VARBINARY(MAX)", nullable: true),
+                    Bio = table.Column<string>(type: "NVARCHAR(255)", maxLength: 255, nullable: true),
+                    DateJoined = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
                     LastLogin = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
                 constraints: table =>
@@ -48,14 +48,14 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "Projects",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "varchar", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar", maxLength: 255, nullable: true),
-                    Status = table.Column<string>(type: "varchar", maxLength: 50, nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    PrincipalID = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, defaultValueSql: "'Active'"),
+                    DateCreated = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
+                    PrincipalID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,8 +72,8 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "UserSkills",
                 columns: table => new
                 {
-                    UserID = table.Column<int>(type: "INTEGER", nullable: false),
-                    SkillID = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserID = table.Column<int>(type: "int", nullable: false),
+                    SkillID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,19 +87,18 @@ namespace Project_Backend_2024.Repositories.Migrations
                         name: "FK_UserSkills_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "AppliedProjects",
                 columns: table => new
                 {
-                    ApplicationStatus = table.Column<string>(type: "varchar", maxLength: 50, nullable: false),
+                    ApplicationStatus = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, defaultValueSql: "'Active'"),
                     DateApplied = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CoverLetter = table.Column<string>(type: "nvarchar", maxLength: 255, nullable: true),
-                    UserID = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProjectID = table.Column<int>(type: "INTEGER", nullable: false)
+                    CoverLetter = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UserID = table.Column<int>(type: "int", nullable: false),
+                    ProjectID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -113,8 +112,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                         name: "FK_AppliedProjects_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -129,9 +127,21 @@ namespace Project_Backend_2024.Repositories.Migrations
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Projects_Name",
+                table: "Projects",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Projects_PrincipalID",
                 table: "Projects",
                 column: "PrincipalID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Skills_Name",
+                table: "Skills",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Username",

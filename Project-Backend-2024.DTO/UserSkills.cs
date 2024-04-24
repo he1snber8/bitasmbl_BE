@@ -1,6 +1,6 @@
 ﻿namespace Project_Backend_2024.DTO;
 
-public class UserSkills
+public class UserSkills : IBasic
 {
     public User? User { get; set; }
     public int UserID { get; set; }

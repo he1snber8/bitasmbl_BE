@@ -4,9 +4,9 @@ using Project_Backend_2024.Repositories.Configurations;
 
 namespace Project_Backend_2024.Repositories;
 
-public class DatabaseConnector : DbContext
+public class DatabaseContext : DbContext
 {
-    public DatabaseConnector(DbContextOptions<DatabaseConnector> opts) : base(opts) { }
+    public DatabaseContext(DbContextOptions<DatabaseContext> opts) : base(opts) { }
 
     public DbSet<User> Users { get; set; }
     public DbSet<AppliedProject> AppliedProjects { get; set; }

@@ -1,6 +1,4 @@
-﻿using Project_Backend_2024.Facade;
-
-namespace Project_Backend_2024.DTO;
+﻿namespace Project_Backend_2024.DTO;
 
 public class Project : IEntity, IDeletable
 {

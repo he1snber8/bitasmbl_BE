@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project_Backend_2024.Repositories;
@@ -10,22 +11,28 @@ using Project_Backend_2024.Repositories;
 
 namespace Project_Backend_2024.Repositories.Migrations
 {
-    [DbContext(typeof(DatabaseConnector))]
-    [Migration("20240421150104_Initial")]
-    partial class Initial
+    [DbContext(typeof(DatabaseContext))]
+    [Migration("20240424082426_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.15");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "7.0.15")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Project_Backend_2024.DTO.AppliedProject", b =>
                 {
                     b.Property<string>("ApplicationStatus")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar");
+                        .HasColumnType("varchar")
+                        .HasDefaultValueSql("'Active'");
 
                     b.Property<string>("CoverLetter")
                         .HasMaxLength(255)
@@ -35,10 +42,10 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<int>("ProjectID")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("UserID")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasIndex("UserID");
 
@@ -52,12 +59,14 @@ namespace Project_Backend_2024.Repositories.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
@@ -65,7 +74,7 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("bit")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
@@ -74,14 +83,19 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("varchar");
 
                     b.Property<int>("PrincipalID")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar");
+                        .HasColumnType("varchar")
+                        .HasDefaultValueSql("'Active'");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("PrincipalID");
 
@@ -92,7 +106,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -101,6 +117,9 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Skills");
                 });
 
@@ -108,7 +127,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Bio")
                         .HasMaxLength(255)
@@ -117,7 +138,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Property<DateTime?>("DateJoined")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -126,7 +147,7 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("bit")
                         .HasDefaultValue(false);
 
                     b.Property<DateTime?>("LastLogin")
@@ -138,7 +159,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("varbinary");
 
                     b.Property<byte[]>("Picture")
-                        .HasColumnType("BLOB");
+                        .HasColumnType("VARBINARY(MAX)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -156,10 +177,10 @@ namespace Project_Backend_2024.Repositories.Migrations
             modelBuilder.Entity("Project_Backend_2024.DTO.UserSkills", b =>
                 {
                     b.Property<int>("SkillID")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("UserID")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasIndex("SkillID");
 
@@ -180,7 +201,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasOne("Project_Backend_2024.DTO.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -210,7 +231,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasOne("Project_Backend_2024.DTO.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Skill");

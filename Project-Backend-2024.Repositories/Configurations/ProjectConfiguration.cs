@@ -31,7 +31,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.Property(p => p.DateCreated)
             .HasColumnType("datetime")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasDefaultValueSql("GETDATE()");
 
         builder.HasOne(p => p.User)
             .WithMany(user => user.Projects)
