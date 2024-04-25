@@ -2,8 +2,6 @@
 using Project_Backend_2024.DTO;
 using Project_Backend_2024.Repositories.Configurations;
 
-namespace Project_Backend_2024.Repositories;
-
 public class DatabaseContext : DbContext
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> opts) : base(opts) { }

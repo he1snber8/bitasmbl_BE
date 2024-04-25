@@ -11,7 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
-        options.UseSqlServer("server = database-1.chk6gakouzh7.eu-central-1.rds.amazonaws.com,1433; User Id=admin;Password=meditations;Database = mydatabase;TrustServerCertificate  = true") //connection string
+        options.UseSqlServer(builder.Configuration["MSSQLConnection"]) //connection string
         );
 
 var app = builder.Build();
