@@ -1,6 +1,6 @@
 ﻿namespace Project_Backend_2024.Services.Models;
 
-internal class ProjectModel
+public class ProjectModel : IEntityModel, IBasicModel
 {
     public int Id { get; }
     public string Name { get; set; } = null!;

@@ -20,8 +20,7 @@ namespace Project_Backend_2024.Repositories.Configurations
             .IsUnique();
 
             builder.Property(u => u.Password)
-            .HasColumnType("varbinary")
-            .HasMaxLength(35)
+            .HasColumnType("varbinary(MAX)")
             .IsRequired()
             .HasConversion(
             p => p.HashData(),
