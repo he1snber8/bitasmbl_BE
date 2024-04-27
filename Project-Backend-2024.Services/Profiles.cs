@@ -9,6 +9,7 @@ public class Profiles : Profile
     public Profiles()
     {
         CreateMap<User, UserModel>();
+        CreateMap<UserModel, User>();
         CreateMap<Project, ProjectModel>();
         CreateMap<AppliedProject, AppliedProjectModel>();
         CreateMap<UserSkills, UserSkillsModel>();

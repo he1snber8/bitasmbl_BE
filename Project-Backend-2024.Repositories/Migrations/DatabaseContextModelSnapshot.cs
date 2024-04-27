@@ -3,20 +3,16 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Project_Backend_2024.Repositories;
 
 #nullable disable
 
 namespace Project_Backend_2024.Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240424082426_Init")]
-    partial class Init
+    partial class DatabaseContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,8 +151,7 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(35)
-                        .HasColumnType("varbinary");
+                        .HasColumnType("varbinary(MAX)");
 
                     b.Property<byte[]>("Picture")
                         .HasColumnType("VARBINARY(MAX)");

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Project_Backend_2024.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Username = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
-                    Password = table.Column<byte[]>(type: "varbinary(35)", maxLength: 35, nullable: false),
+                    Password = table.Column<byte[]>(type: "varbinary(MAX)", nullable: false),
                     Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     Picture = table.Column<byte[]>(type: "VARBINARY(MAX)", nullable: true),
                     Bio = table.Column<string>(type: "NVARCHAR(255)", maxLength: 255, nullable: true),

@@ -1,6 +1,6 @@
 ﻿namespace Project_Backend_2024.Services.Models;
 
-internal class AppliedProjectModel
+public class AppliedProjectModel : IBasicModel
 {
     public string? CoverLetter { get; set; }
     public string ApplicationStatus { get; set; } = null!;
