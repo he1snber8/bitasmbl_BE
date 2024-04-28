@@ -1,9 +1,12 @@
 ﻿
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Project_Backend_2024.DTO;
 using Project_Backend_2024.Facade.Interfaces;
+using Project_Backend_2024.Services.Exceptions;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Models;
+using System.Reflection;
 
 namespace Project_Backend_2024.Services.CommandServices;
 
@@ -23,9 +26,18 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
         _repository = repository;
     }
 
-    public virtual Task<int> Delete(int id)
+    public virtual async Task<int> Delete(int id)
     {
-        return null;
+        var entity = _repository.Set(u => u.Id == id).SingleOrDefault()
+           ?? throw new KeyNotFoundException();
+
+        if (entity is IDeletable deletableEntity) { deletableEntity.IsDeleted = true; }
+
+        _repository.Update(entity);
+        await _unitOfWork!.SaveChangesAsync();
+
+        return entity.Id;
+
     }
 
     public virtual async Task<int> Insert(TEntityModel model)
@@ -42,13 +54,17 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
 
     public virtual async Task Update(int id, TEntityModel model)
     {
-        //var entity = _repository.Set(u => u.Id == id).SingleOrDefault()
-        //   ?? throw new KeyNotFoundException(id);
+        var entity = _repository.Set(u => u.Id == id).SingleOrDefault();
+        if (entity == null)
+            throw new KeyNotFoundException();
 
-        //if (entity is IDeletable deletableEntity && deletableEntity.IsDeleted)
-        //    throw new EntityNotFoundException<TEntity>(id);
+        _mapper.Map(model, entity); // Map the properties from the model to the entity
 
-        //_repository.Update(entity);
-        //await _unitOfWork!.SaveChangesAsync();
+        if (entity is IDeletable deletableEntity && deletableEntity.IsDeleted)
+            throw new EntityNotFoundException<TEntity>(id);
+
+        _repository.Update(entity); // Mark the entity as modified
+
+        await _unitOfWork.SaveChangesAsync();
     }
 }

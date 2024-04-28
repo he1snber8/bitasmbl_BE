@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Models;
 
@@ -9,16 +8,16 @@ public abstract class BaseController<TModel, TCommand> : Controller
     where TModel : class, IBasicModel
     where TCommand : ICommandModel<TModel>
 {
-    protected TCommand _command;
+    protected TCommand _commandService;
 
-    public BaseController(TCommand command) => _command = command ?? throw new ArgumentNullException(nameof(command));
+    public BaseController(TCommand commandService) => _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
     [HttpPost("insert")]
     public virtual async Task<IActionResult> Insert([FromBody] TModel model)
     {
         try
         {
-            await _command.Insert(model);
+            await _commandService.Insert(model);
         }
         catch (Exception ex)
         {
@@ -28,12 +27,12 @@ public abstract class BaseController<TModel, TCommand> : Controller
         return Ok("Entity inserted successfully!");
     }
 
-    [HttpDelete("delete")]
-    public virtual async Task<IActionResult> Delete(int id)
+    [HttpDelete("delete/{id:int}")]
+    public virtual async Task<IActionResult> Delete([FromRoute] int id)
     {
         try
         {
-            await _command.Delete(id);
+            await _commandService.Delete(id);
         }
         catch (Exception ex)
         {
@@ -44,12 +43,12 @@ public abstract class BaseController<TModel, TCommand> : Controller
     }
 
 
-    [HttpPut("update")]
-    public virtual async Task<IActionResult> Update(int id, TModel model)
+    [HttpPut("update/{id:int}")]
+    public virtual async Task<IActionResult> Update([FromRoute]int id, [FromBody] TModel model)
     {
         try
         {
-           await _command.Update(id, model);
+           await _commandService.Update(id, model);
         }
         catch (Exception ex)
         {

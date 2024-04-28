@@ -8,7 +8,7 @@ using Project_Backend_2024.Services.Models;
 
 namespace Project_Backend_2024.Services.CommandServices;
 
-public class UserCommandService : BaseCommandService<UserModel, User, IUserRepository>, IUserCommand
+public class UserCommandService : BaseCommandService<UserModel, User, IUserRepository>, IUserCommandService
 {
     public UserCommandService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository repository) : base(unitOfWork, mapper, repository)
     {
@@ -25,8 +25,6 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
 
     public override async Task<int> Delete(int id) => await base.Delete(id);
 
-    public override async Task Update(int id, UserModel model)
-    {
-        await base.Update(id, model);
-    }
+    public override async Task Update(int id, UserModel model) => await base.Update(id, model);
+
 }
