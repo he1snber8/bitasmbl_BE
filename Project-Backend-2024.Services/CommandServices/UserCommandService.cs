@@ -1,7 +1,6 @@
-﻿
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.Facade.BasicOperations;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Models;
@@ -10,17 +9,15 @@ namespace Project_Backend_2024.Services.CommandServices;
 
 public class UserCommandService : BaseCommandService<UserModel, User, IUserRepository>, IUserCommandService
 {
-    public UserCommandService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository repository) : base(unitOfWork, mapper, repository)
-    {
-    }
+    public UserCommandService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository repository) : base(unitOfWork, mapper, repository) { }
 
-    public override Task<int> Insert(UserModel model)
+    public override async Task<int> Insert(UserModel model)
     {
-        if (model.Username.Length < 5) throw new Exception(model.Username);
-        if (model.Password.Length < 5 || !model.Password.Any(char.IsDigit)) throw new Exception(model.Password);
-        if (model.Email.Length < 8 || !model.Email.Contains('@')) throw new Exception(model.Email);
+        if (!model.ValidateUsername()) throw new Exception(model.Username);
+        if (!model.ValidatePassword()) throw new Exception(model.Password);
+        if (!model.ValidateEmail()) throw new Exception(model.Email);
 
-        return base.Insert(model);
+        return await base.Insert(model);
     }
 
     public override async Task<int> Delete(int id) => await base.Delete(id);

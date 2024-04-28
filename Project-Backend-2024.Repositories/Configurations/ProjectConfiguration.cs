@@ -10,16 +10,14 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.Property(p => p.Name)
             .HasColumnType("varchar")
-            .HasMaxLength(50)
-            .IsRequired();
+            .HasMaxLength(50);
 
         builder.HasIndex(p => p.Name)
            .IsUnique();
 
         builder.Property(p => p.Description)
             .HasColumnType("nvarchar")
-            .HasMaxLength(255)
-            .IsRequired(false);
+            .HasMaxLength(255);
 
         builder.Property(p => p.Status)
             .HasColumnType("varchar")

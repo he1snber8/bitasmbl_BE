@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Project_Backend_2024.Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240427171410_Initial")]
+    [Migration("20240428145908_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -27,7 +27,6 @@ namespace Project_Backend_2024.Repositories.Migrations
             modelBuilder.Entity("Project_Backend_2024.DTO.AppliedProject", b =>
                 {
                     b.Property<string>("ApplicationStatus")
-                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("varchar")
@@ -38,7 +37,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("nvarchar");
 
                     b.Property<DateTime?>("DateApplied")
-                        .HasColumnType("datetime");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("ProjectID")
                         .HasColumnType("int");
@@ -77,7 +78,6 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
 
@@ -85,7 +85,6 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("varchar")
@@ -94,7 +93,8 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
 
                     b.HasIndex("PrincipalID");
 
@@ -140,7 +140,6 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
 
@@ -153,21 +152,24 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("varbinary(MAX)");
 
                     b.Property<byte[]>("Picture")
                         .HasColumnType("VARBINARY(MAX)");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
+
                     b.HasIndex("Username")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[Username] IS NOT NULL");
 
                     b.ToTable("Users");
                 });

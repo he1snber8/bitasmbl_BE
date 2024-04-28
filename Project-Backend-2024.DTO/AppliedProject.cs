@@ -2,7 +2,7 @@
 
 public class AppliedProject : IBasic
 {
-    public string ApplicationStatus { get; set; } = null!;
+    public string? ApplicationStatus { get; set; }
     public DateTime? DateApplied{ get; set; }
     public string? CoverLetter { get; set; }
 

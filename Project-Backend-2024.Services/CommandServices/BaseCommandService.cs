@@ -1,12 +1,10 @@
 ﻿
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Project_Backend_2024.DTO;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services.Exceptions;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Models;
-using System.Reflection;
 
 namespace Project_Backend_2024.Services.CommandServices;
 
@@ -54,16 +52,16 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
 
     public virtual async Task Update(int id, TEntityModel model)
     {
-        var entity = _repository.Set(u => u.Id == id).SingleOrDefault();
+        var entity = _repository.Set(u => u.Id == id).FirstOrDefault();
         if (entity == null)
             throw new KeyNotFoundException();
 
-        _mapper.Map(model, entity); // Map the properties from the model to the entity
+        _mapper.Map(model, entity);
 
         if (entity is IDeletable deletableEntity && deletableEntity.IsDeleted)
             throw new EntityNotFoundException<TEntity>(id);
 
-        _repository.Update(entity); // Mark the entity as modified
+        _repository.Update(entity);
 
         await _unitOfWork.SaveChangesAsync();
     }

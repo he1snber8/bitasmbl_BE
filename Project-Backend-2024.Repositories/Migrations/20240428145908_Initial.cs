@@ -31,9 +31,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Username = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
-                    Password = table.Column<byte[]>(type: "varbinary(MAX)", nullable: false),
-                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Username = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: true),
+                    Password = table.Column<byte[]>(type: "varbinary(MAX)", nullable: true),
+                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     Picture = table.Column<byte[]>(type: "VARBINARY(MAX)", nullable: true),
                     Bio = table.Column<string>(type: "NVARCHAR(255)", maxLength: 255, nullable: true),
                     DateJoined = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
@@ -51,9 +51,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, defaultValueSql: "'Active'"),
+                    Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValueSql: "'Active'"),
                     DateCreated = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
                     PrincipalID = table.Column<int>(type: "int", nullable: false)
                 },
@@ -94,8 +94,8 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "AppliedProjects",
                 columns: table => new
                 {
-                    ApplicationStatus = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, defaultValueSql: "'Active'"),
-                    DateApplied = table.Column<DateTime>(type: "datetime", nullable: true),
+                    ApplicationStatus = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValueSql: "'Active'"),
+                    DateApplied = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
                     CoverLetter = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     UserID = table.Column<int>(type: "int", nullable: false),
                     ProjectID = table.Column<int>(type: "int", nullable: false)
@@ -130,7 +130,8 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "IX_Projects_Name",
                 table: "Projects",
                 column: "Name",
-                unique: true);
+                unique: true,
+                filter: "[Name] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_PrincipalID",
@@ -144,10 +145,18 @@ namespace Project_Backend_2024.Repositories.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true,
+                filter: "[Email] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Username",
                 table: "Users",
                 column: "Username",
-                unique: true);
+                unique: true,
+                filter: "[Username] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserSkills_SkillID",

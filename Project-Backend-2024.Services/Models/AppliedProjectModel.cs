@@ -3,7 +3,7 @@
 public class AppliedProjectModel : IBasicModel
 {
     public string? CoverLetter { get; set; }
-    public string ApplicationStatus { get; set; } = null!;
+    public string? ApplicationStatus { get; set; }
     public int ProjectID { get; set; }
     public int UserID { get; set; }
 }

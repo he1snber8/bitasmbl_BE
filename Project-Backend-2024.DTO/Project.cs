@@ -4,9 +4,9 @@ public class Project : IEntity, IDeletable
 {
     public int Id { get; }
     public bool IsDeleted { get; set; }
-    public string Name { get; set; } = null!;
-    public string? Description { get; set; } = null!;
-    public string Status { get; set; } = null!;
+    public string? Name { get; set; }
+    public string? Description { get; set; } 
+    public string? Status { get; set; } 
     public DateTime? DateCreated { get; set; }
     
     public User? User { get; set; }
