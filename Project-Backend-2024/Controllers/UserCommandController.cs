@@ -6,9 +6,9 @@ namespace Project_Backend_2024.Controllers;
 
 [ApiController]
 [Route("api/commands/users")]
-public class UserCommandController : BaseController<UserModel, IUserCommand>
+public class UserCommandController : BaseController<UserModel, IUserCommandService>
 {
-    public UserCommandController(IUserCommand command) : base(command) { }
+    public UserCommandController(IUserCommandService command) : base(command) { }
 
     public override async Task<IActionResult> Insert([FromBody] UserModel model) => await base.Insert(model);
 

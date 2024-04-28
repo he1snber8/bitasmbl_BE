@@ -27,11 +27,11 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IAppliedProjectRepository, AppliedProjectRepository>();
 builder.Services.AddScoped<IUserSkillsRepository, UserSkillsRepository>();
 
-builder.Services.AddScoped<IUserCommand, UserCommandService>();
+builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 
 builder.Services.AddControllers();
 
-builder.Services.AddAutoMapper(typeof(Profiles).Assembly);
+builder.Services.AddAutoMapper(typeof(Mappers).Assembly);
 
 var app = builder.Build();
 
