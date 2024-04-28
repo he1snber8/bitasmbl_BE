@@ -13,15 +13,16 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(u => u.Username)
            .HasColumnType("varchar")
-           .HasMaxLength(30)
-           .IsRequired();
+           .HasMaxLength(30);
 
             builder.HasIndex(u => u.Username)
             .IsUnique();
 
+            builder.HasIndex(u => u.Email)
+            .IsUnique();
+
             builder.Property(u => u.Password)
             .HasColumnType("varbinary(MAX)")
-            .IsRequired()
             .HasConversion(
             p => p.HashData(),
             p => p);
@@ -31,8 +32,7 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(u => u.Email)
             .HasMaxLength(50)
-            .HasColumnType("varchar")
-            .IsRequired();
+            .HasColumnType("varchar");
 
             builder.Property(c => c.DateJoined)
             .HasColumnType("datetime")
@@ -43,16 +43,14 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(m => m.Bio)
             .HasColumnType("NVARCHAR")
-            .HasMaxLength(255)
-            .IsRequired(false);
+            .HasMaxLength(255);
 
             builder.HasMany(p => p.Projects)
-                .WithOne(u => u.User)
-                .HasForeignKey(u => u.PrincipalID);
+            .WithOne(u => u.User)
+            .HasForeignKey(u => u.PrincipalID);
 
             builder.Property(m => m.Picture)
-           .HasColumnType("VARBINARY(MAX)")
-           .IsRequired(false);
+           .HasColumnType("VARBINARY(MAX)");
 
         }
     }
