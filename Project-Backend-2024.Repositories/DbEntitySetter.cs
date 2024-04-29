@@ -2,7 +2,7 @@
 using Project_Backend_2024.DTO;
 
 public abstract class DbEntitySetter<TEntity, TDbContext>
-    where TEntity : class, IBasic
+    where TEntity : class, IEntity
     where TDbContext : DbContext
 {
     protected readonly TDbContext _context;

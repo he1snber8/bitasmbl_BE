@@ -2,7 +2,7 @@
 
 namespace Project_Backend_2024.Services.Models;
 
-public class UserModel : IAuthenticatable, IBasicModel
+public class UserModel : IEntityModel, IAuthenticatable
 {
     public int Id { get; }
     public string? Username { get; set; } 
