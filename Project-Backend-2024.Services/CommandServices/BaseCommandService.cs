@@ -31,7 +31,6 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
 
         if (entity is IDeletable deletableEntity) { deletableEntity.IsDeleted = true; }
 
-        _repository.Update(entity);
         await _unitOfWork!.SaveChangesAsync();
 
         return entity.Id;
@@ -52,16 +51,13 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
 
     public virtual async Task Update(int id, TEntityModel model)
     {
-        var entity = _repository.Set(u => u.Id == id).FirstOrDefault();
-        if (entity == null)
-            throw new KeyNotFoundException();
-
+        var entity = _repository.Set(u => u.Id == id).FirstOrDefault() ??
+            throw new KeyNotFoundException();;
+  
         _mapper.Map(model, entity);
 
         if (entity is IDeletable deletableEntity && deletableEntity.IsDeleted)
             throw new EntityNotFoundException<TEntity>(id);
-
-        _repository.Update(entity);
 
         await _unitOfWork.SaveChangesAsync();
     }
