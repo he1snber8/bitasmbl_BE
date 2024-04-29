@@ -11,7 +11,7 @@ public interface IRepositoryBase <TEntity>
     IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate);
     void Update(TEntity entity);
     void Delete(object id);
-    TEntity? Get(params object[] id);
-    IEnumerable<TEntity> GetAll();
-    IEnumerable<TEntity> SetMany(Expression<Func<TEntity, bool>> predicate);
+    Task<TEntity?> Get(params object[] id);
+    Task<IEnumerable<TEntity>> GetAll();
+    Task<IEnumerable<TEntity>> SetMany(Expression<Func<TEntity, bool>> predicate);
 }

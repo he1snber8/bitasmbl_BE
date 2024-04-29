@@ -10,11 +10,11 @@ namespace Project_Backend_2024.Repositories
     {
         public RepositoryBase(DatabaseContext context) : base(context) { }
 
-        public TEntity? Get(params object[] id)
+        public async Task<TEntity?> Get(params object[] id)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
 
-            return _dbSet.Find(id);
+            return await _dbSet.FindAsync(id);
         }
 
         public IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate) => _dbSet.Where(predicate);
@@ -47,9 +47,9 @@ namespace Project_Backend_2024.Repositories
             _dbSet.Remove(entity);
         }
 
-        public IEnumerable<TEntity> GetAll() => _context.Set<TEntity>().AsNoTracking().ToList();
+        public async Task<IEnumerable<TEntity>> GetAll() => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
 
-        public IEnumerable<TEntity> SetMany(Expression<Func<TEntity, bool>> predicate) => _dbSet.AsNoTracking().Where(predicate).ToList();
+        public async Task<IEnumerable<TEntity>> SetMany(Expression<Func<TEntity, bool>> predicate) => await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
 
     }
 }
