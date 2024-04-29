@@ -10,9 +10,8 @@ public interface IRepositoryBase <TEntity>
     void Delete(TEntity entity);
     IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate);
     void Update(TEntity entity);
-    IQueryable<TEntity> Set();
     void Delete(object id);
     TEntity? Get(params object[] id);
     IEnumerable<TEntity> GetAll();
-    IEnumerable<TEntity> SetAsNoTracking(Expression<Func<TEntity, bool>> predicate);
+    IEnumerable<TEntity> SetMany(Expression<Func<TEntity, bool>> predicate);
 }
