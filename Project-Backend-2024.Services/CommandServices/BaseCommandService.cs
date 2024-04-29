@@ -9,8 +9,8 @@ using Project_Backend_2024.Services.Models;
 namespace Project_Backend_2024.Services.CommandServices;
 
 public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : ICommandModel<TEntityModel>
-    where TEntityModel : class, IBasicModel
-    where TEntity : class, IBasic
+    where TEntityModel : class, IEntityModel
+    where TEntity : class, IEntity
     where TRepository : IRepositoryBase<TEntity>
 {
     protected readonly IMapper _mapper;
@@ -26,7 +26,7 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
 
     public virtual async Task<int> Delete(int id)
     {
-        var entity = _repository.Set(u => u.Id == id).SingleOrDefault()
+        var entity  = _repository.Set(u => u.Id == id).SingleOrDefault()
            ?? throw new KeyNotFoundException();
 
         if (entity is IDeletable deletableEntity) { deletableEntity.IsDeleted = true; }

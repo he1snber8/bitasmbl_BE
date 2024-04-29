@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 namespace Project_Backend_2024.Repositories
 {
     public abstract class RepositoryBase<TEntity> : DbEntitySetter<TEntity, DatabaseContext>, IRepositoryBase<TEntity>
-    where TEntity : class, IBasic
+    where TEntity : class, IEntity
     {
         public RepositoryBase(DatabaseContext context) : base(context) { }
 

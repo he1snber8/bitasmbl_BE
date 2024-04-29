@@ -4,13 +4,16 @@ using Project_Backend_2024.Services.Models;
 
 namespace Project_Backend_2024.Controllers;
 
-public abstract class BaseController<TModel, TCommand> : Controller
-    where TModel : class, IBasicModel
+
+[ApiController]
+[Route("api/commands/[controller]")]
+public abstract class BaseCommandController<TModel, TCommand> : Controller
+    where TModel : class, IEntityModel
     where TCommand : ICommandModel<TModel>
 {
     protected TCommand _commandService;
 
-    public BaseController(TCommand commandService) => _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+    public BaseCommandController(TCommand commandService) => _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
     [HttpPost("insert")]
     public virtual async Task<IActionResult> Insert([FromBody] TModel model)
