@@ -19,9 +19,4 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
 
         return await base.Insert(model);
     }
-
-    public override async Task<int> Delete(int id) => await base.Delete(id);
-
-    public override async Task Update(int id, UserModel model) => await base.Update(id, model);
-
 }

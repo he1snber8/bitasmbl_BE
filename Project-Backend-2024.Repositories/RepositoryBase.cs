@@ -51,5 +51,7 @@ namespace Project_Backend_2024.Repositories
 
         public IEnumerable<TEntity> GetAll() => _context.Set<TEntity>().AsNoTracking().ToList();
 
+        public IEnumerable<TEntity> SetAsNoTracking(Expression<Func<TEntity, bool>> predicate) => _dbSet.AsNoTracking().Where(predicate).ToList();
+
     }
 }
