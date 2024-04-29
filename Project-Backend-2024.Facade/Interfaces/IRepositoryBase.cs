@@ -13,4 +13,6 @@ public interface IRepositoryBase <TEntity>
     IQueryable<TEntity> Set();
     void Delete(object id);
     TEntity? Get(params object[] id);
+    IEnumerable<TEntity> GetAll();
+    IEnumerable<TEntity> SetAsNoTracking(Expression<Func<TEntity, bool>> predicate);
 }

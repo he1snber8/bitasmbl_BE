@@ -10,7 +10,7 @@ namespace Project_Backend_2024.Services.CommandServices;
 
 public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : ICommandModel<TEntityModel>
     where TEntityModel : class, IBasicModel
-    where TEntity : class, IEntity
+    where TEntity : class, IBasic
     where TRepository : IRepositoryBase<TEntity>
 {
     protected readonly IMapper _mapper;
