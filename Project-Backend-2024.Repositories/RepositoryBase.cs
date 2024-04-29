@@ -17,7 +17,7 @@ namespace Project_Backend_2024.Repositories
             return _dbSet.Find(id);
         }
 
-        public IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate) => _dbSet.Where(predicate).AsNoTracking();
+        public IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate) => _dbSet.Where(predicate);
 
         public IQueryable<TEntity> Set() => _dbSet;
 
@@ -49,7 +49,7 @@ namespace Project_Backend_2024.Repositories
             _dbSet.Remove(entity);
         }
 
-        public IEnumerable<TEntity> GetAll() => _context.Set<TEntity>().ToList();
+        public IEnumerable<TEntity> GetAll() => _context.Set<TEntity>().AsNoTracking().ToList();
 
     }
 }
