@@ -24,6 +24,7 @@ Startup.cs
 
 #ignore appsettings
 appsettings.*
+appsettings.json
 
 # Ignore launch settings
 launchSettings.json
