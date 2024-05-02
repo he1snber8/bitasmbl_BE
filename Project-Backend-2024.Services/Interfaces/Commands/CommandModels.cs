@@ -1,8 +1,9 @@
 ﻿
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.Models;
 
-namespace  Project_Backend_2024.Services.Interfaces.Commands;
+namespace Project_Backend_2024.Services.Interfaces.Commands;
 
 public interface IUserCommandService : ICommandModel<UserModel>
 {
