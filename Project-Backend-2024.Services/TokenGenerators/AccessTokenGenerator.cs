@@ -10,7 +10,6 @@ namespace Project_Backend_2024.Services.TokenGenerators;
 
 public class AccessTokenGenerator
 {
-
     private readonly IConfiguration _configuration;
 
     public AccessTokenGenerator(IConfiguration configuration)
@@ -35,7 +34,9 @@ public class AccessTokenGenerator
             "http://localhost:5237", 
             claims,
             DateTime.UtcNow,
-            DateTime.UtcNow.AddHours(1),
+            DateTime.UtcNow.AddMinutes(40),
             credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
