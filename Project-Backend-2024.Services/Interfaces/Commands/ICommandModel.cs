@@ -1,6 +1,6 @@
 ﻿
 
-using Project_Backend_2024.Services.Models;
+using Project_Backend_2024.Facade.Models;
 
 namespace Project_Backend_2024.Services.Interfaces.Commands;
 

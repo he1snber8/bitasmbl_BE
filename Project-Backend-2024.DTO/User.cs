@@ -1,6 +1,6 @@
 ﻿namespace Project_Backend_2024.DTO;
 
-public class User : IEntity, IAuthenticatable, IDeletable 
+public class User : IEntity, IAuthenticatable, IDeletable, IMailApplicable
 {
     public int Id { get; }
     public bool IsDeleted { get; set; }

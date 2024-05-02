@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_Backend_2024.Services.Interfaces.Commands;
-using Project_Backend_2024.Services.Models;
+using Project_Backend_2024.Facade.Models;
 
 namespace Project_Backend_2024.Controllers;
 

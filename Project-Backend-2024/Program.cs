@@ -6,7 +6,6 @@ builder.Services.RegisterServices(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.AddInternalFiles();
 
 var app = builder.Build();
 
