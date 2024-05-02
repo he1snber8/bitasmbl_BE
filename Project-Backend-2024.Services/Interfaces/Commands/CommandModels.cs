@@ -1,12 +1,12 @@
 ﻿
 using Project_Backend_2024.DTO;
-using Project_Backend_2024.Services.Models;
+using Project_Backend_2024.Facade.Models;
 
 namespace  Project_Backend_2024.Services.Interfaces.Commands;
 
 public interface IUserCommandService : ICommandModel<UserModel>
 {
-    Task<int> Login(IAuthenticatable loginModel);
+    (bool,User) AutheticateLogin(IAuthenticatable loginModel);
 }
 
 public interface IProjectCommandService : ICommandModel<ProjectModel> { }

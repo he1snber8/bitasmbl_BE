@@ -5,7 +5,7 @@ using Project_Backend_2024.Facade.BasicOperations;
 using Project_Backend_2024.Facade.Exceptions;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services.Interfaces.Commands;
-using Project_Backend_2024.Services.Models;
+using Project_Backend_2024.Facade.Models;
 using System.Reflection;
 
 namespace Project_Backend_2024.Services.CommandServices;
@@ -23,13 +23,11 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
         return await base.Insert(model);
     }
 
-    public Task<int> Login(IAuthenticatable loginModel)
+    public (bool,User) AutheticateLogin(IAuthenticatable loginModel)
     {
         User user = _repository.Set(m => m.Username == loginModel.Username).SingleOrDefault() ?? throw new ArgumentNullException();
-        
-        /*if true, give jwt*/ loginModel.Password.HashEquals(user.Password);
 
-        throw new NotImplementedException();
+        return (loginModel.Password.HashEquals(user.Password), user);
     }
 }
 

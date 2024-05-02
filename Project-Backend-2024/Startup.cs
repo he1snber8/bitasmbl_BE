@@ -3,6 +3,8 @@ using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services;
 using Project_Backend_2024.Services.CommandServices;
 using Project_Backend_2024.Services.Interfaces.Commands;
+using Project_Backend_2024.Services.TokenGenerators;
+using Project_Backend_2024.Services.TokenGenerators.Interfaces;
 
 namespace Project_Backend_2024;
 
@@ -30,8 +32,12 @@ internal static class Startup
         services.AddScoped<IUserSkillsCommandService, UserSkillsCommandService>();
         /*QUERY SERVICES HERE*/
 
-        services.AddControllers();
 
+
+
+        /*OTHER SERVICES HERE*/
+        services.AddSingleton<IUserAccessToken,AccessTokenGenerator>();
+        services.AddControllers();
         services.AddAutoMapper(typeof(Mappers).Assembly);
 
         return services;
