@@ -9,7 +9,7 @@ public static class CredentialValidator
             entity.Password!.Length > 7 && entity.Password!.Any(char.IsUpper) && entity.Password!.Any(char.IsDigit);
 
 
-    public static bool ValidateEmail(this IAuthenticatable entity) =>
+    public static bool ValidateEmail(this IMailApplicable entity) =>
             entity.Email!.Length > 8 || entity.Email!.Contains('@');
 
     public static bool ValidateUsername(this IAuthenticatable entity) =>

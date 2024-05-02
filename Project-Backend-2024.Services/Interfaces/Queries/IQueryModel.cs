@@ -8,6 +8,6 @@ public interface IQueryModel<TEntity>
 {
     TEntity GetById(int id);
     IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate);
-    IEnumerable<TEntity> GetAll();
-    IEnumerable<TEntity> SetMany(Expression<Func<TEntity, bool>> predicate);
+    Task<IEnumerable<TEntity>> GetAll();
+    Task<IEnumerable<TEntity>> SetMany(Expression<Func<TEntity, bool>> predicate);
 }
