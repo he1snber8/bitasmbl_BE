@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project_Backend_2024.Facade.Interfaces;
+using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services;
 using Project_Backend_2024.Services.CommandServices;
 using Project_Backend_2024.Services.Interfaces.Commands;
@@ -12,6 +13,11 @@ internal static class Startup
 {
     internal static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var authConfiguration = new AuthConfiguration();
+
+        configuration.Bind("JWT", authConfiguration);
+        services.AddSingleton(authConfiguration);
+
         services.AddDbContext<DatabaseContext>(options =>
         {
             options.UseSqlServer(configuration.GetConnectionString("MSSQLConnection"));
