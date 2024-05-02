@@ -1,4 +1,6 @@
-﻿using Project_Backend_2024.Services.Interfaces.Commands;
+﻿using Microsoft.AspNetCore.Mvc;
+using Project_Backend_2024.Facade.Exceptions;
+using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Models;
 
 namespace Project_Backend_2024.Controllers;
@@ -6,11 +8,37 @@ namespace Project_Backend_2024.Controllers;
 public class UserController : BaseCommandController<UserModel, IUserCommandService>
 {
     public UserController(IUserCommandService command) : base(command) { }
+
+    //public async Task<IActionResult> LogIn([FromBody] UserLoginModel loginModel)
+    //{
+
+    //}
+
+    public override async Task<IActionResult> Insert([FromBody] UserModel model)
+    {
+        try
+        {
+            return await base.Insert(model);
+        }
+        catch (UsernameValidationException ex)
+        {
+            return BadRequest($"Username validation failed: {ex.Message}");
+        }
+        catch (PasswordValidationException ex)
+        {
+            return BadRequest($"Password validation failed: {ex.Message}");
+        }
+        catch (EmailValidationException ex)
+        {
+            return BadRequest($"Email validation failed: {ex.Message}");
+        }
+    }
 }
 
 public class UserSkillsController : BaseCommandController<UserSkillsModel, IUserSkillsCommandService>
 {
     public UserSkillsController(IUserSkillsCommandService commandService) : base(commandService) { }
+
 }
 
 public class ProjectController : BaseCommandController<ProjectModel, IProjectCommandService>

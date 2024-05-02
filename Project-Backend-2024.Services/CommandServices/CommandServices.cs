@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.Facade;
 using Project_Backend_2024.Facade.BasicOperations;
+using Project_Backend_2024.Facade.Exceptions;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Models;
+using System.Reflection;
 
 namespace Project_Backend_2024.Services.CommandServices;
 
@@ -13,11 +16,20 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
 
     public override async Task<int> Insert(UserModel model)
     {
-        if (!model.ValidateUsername()) throw new Exception(model.Username);
-        if (!model.ValidatePassword()) throw new Exception(model.Password);
-        if (!model.ValidateEmail()) throw new Exception(model.Email);
+        if (!model.ValidateUsername() || _repository.Set(m => m.Username == model.Username).SingleOrDefault() != null) throw new UsernameValidationException("Username is either in wrong format or is already in use, please ");
+        if (!model.ValidatePassword()) throw new PasswordValidationException("Password is in wrong format, please check again!");
+        if (!model.ValidateEmail() || _repository.Set(m => m.Email == model.Email).SingleOrDefault() != null) throw new EmailValidationException("Email is either in wrong format or is already registered, please check again!");
 
         return await base.Insert(model);
+    }
+
+    public Task<int> Login(IAuthenticatable loginModel)
+    {
+        User user = _repository.Set(m => m.Username == loginModel.Username).SingleOrDefault() ?? throw new ArgumentNullException();
+        
+        /*if true, give jwt*/ loginModel.Password.HashEquals(user.Password);
+
+        throw new NotImplementedException();
     }
 }
 

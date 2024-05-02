@@ -1,6 +1,7 @@
 ﻿using Project_Backend_2024.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Project_Backend_2024.Facade.BasicOperations;
 
 public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 {
@@ -10,19 +11,21 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.Property(p => p.Name)
             .HasColumnType("varchar")
-            .HasMaxLength(50);
+            .HasMaxLength(50)
+            .IsRequired();
 
         builder.HasIndex(p => p.Name)
            .IsUnique();
 
         builder.Property(p => p.Description)
             .HasColumnType("nvarchar")
-            .HasMaxLength(255);
+            .HasMaxLength(255)
+            .IsRequired();
 
         builder.Property(p => p.Status)
             .HasColumnType("varchar")
             .HasMaxLength(50)
-            .HasDefaultValueSql("'Active'");
+            .HasDefaultValueSql($"'Active'");
 
         builder.Property(p => p.IsDeleted)
             .HasDefaultValue(false);

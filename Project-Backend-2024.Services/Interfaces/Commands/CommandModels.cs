@@ -4,7 +4,10 @@ using Project_Backend_2024.Services.Models;
 
 namespace  Project_Backend_2024.Services.Interfaces.Commands;
 
-public interface IUserCommandService : ICommandModel<UserModel> { }
+public interface IUserCommandService : ICommandModel<UserModel>
+{
+    Task<int> Login(IAuthenticatable loginModel);
+}
 
 public interface IProjectCommandService : ICommandModel<ProjectModel> { }
 

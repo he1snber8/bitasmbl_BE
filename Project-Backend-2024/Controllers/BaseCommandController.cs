@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Models;
 
@@ -15,16 +16,24 @@ public abstract class BaseCommandController<TModel, TCommand> : Controller
 
     public BaseCommandController(TCommand commandService) => _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-    [HttpPost("insert")]
+    [HttpPost("register")]
     public virtual async Task<IActionResult> Insert([FromBody] TModel model)
     {
         try
         {
             await _commandService.Insert(model);
         }
+        catch (DbUpdateException ex)
+        {
+            return BadRequest($"Database failed: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest($"Invalid operation: {ex.Message}");
+        }
         catch (Exception ex)
         {
-            return BadRequest($"operation failed, reason: {ex.Message}");
+            return BadRequest($"Insert operation failed: {ex.Message}");
         }
 
         return Ok("Entity inserted successfully!");
@@ -37,11 +46,18 @@ public abstract class BaseCommandController<TModel, TCommand> : Controller
         {
             await _commandService.Delete(id);
         }
+        catch (DbUpdateException ex)
+        {
+            return BadRequest($"Database failed: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest($"Invalid operation: {ex.Message}");
+        }
         catch (Exception ex)
         {
-            return BadRequest($"operation failed, reason: {ex.Message}");
+            return BadRequest($"Delete operation failed: {ex.Message}");
         }
-
         return Ok("Entity deleted successfully!");
     }
 
@@ -53,9 +69,17 @@ public abstract class BaseCommandController<TModel, TCommand> : Controller
         {
            await _commandService.Update(id, model);
         }
+        catch (DbUpdateException ex)
+        {
+            return BadRequest($"Database failed: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest($"Invalid operation: {ex.Message}");
+        }
         catch (Exception ex)
         {
-            return BadRequest($"operation failed, reason: {ex.Message}");
+            return BadRequest($"Update operation failed: {ex.Message}");
         }
 
         return Ok("Entity updated successfully");

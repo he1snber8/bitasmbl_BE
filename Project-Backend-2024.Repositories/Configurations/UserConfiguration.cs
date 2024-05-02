@@ -13,7 +13,8 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(u => u.Username)
            .HasColumnType("varchar")
-           .HasMaxLength(30);
+           .HasMaxLength(30)
+           .IsRequired();
 
             builder.HasIndex(u => u.Username)
             .IsUnique();
@@ -23,8 +24,9 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(u => u.Password)
             .HasColumnType("varbinary(MAX)")
+            .IsRequired()
             .HasConversion(
-            p => p.HashData(),
+            p => p!.HashData(),
             p => p);
 
             builder.Property(u => u.IsDeleted)
@@ -32,7 +34,8 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(u => u.Email)
             .HasMaxLength(50)
-            .HasColumnType("varchar");
+            .HasColumnType("varchar")
+            .IsRequired();
 
             builder.Property(c => c.DateJoined)
             .HasColumnType("datetime")

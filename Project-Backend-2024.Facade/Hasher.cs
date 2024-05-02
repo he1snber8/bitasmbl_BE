@@ -14,7 +14,7 @@ public static class Hasher
         }
     }
 
-    public static bool HashEquals(this string otherString, string hashedString)
-        => otherString.HashData() == hashedString;
+    public static bool HashEquals(this string thisHash, string otherHash)
+        => thisHash.HashData() == otherHash;
 
 }

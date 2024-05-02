@@ -27,7 +27,7 @@ public abstract class BaseQueryService<TEntity, TRepository> : IQueryModel<TEnti
 
     public IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate) => _repository.Set(predicate);
 
-    public IEnumerable<TEntity> GetAll() => _repository.GetAll();
+    public async Task<IEnumerable<TEntity>> GetAll() => await _repository.GetAll();
 
-    public IEnumerable<TEntity> SetMany(Expression<Func<TEntity, bool>> predicate) => _repository.SetMany(predicate);
+    public Task<IEnumerable<TEntity>> SetMany(Expression<Func<TEntity, bool>> predicate) => _repository.SetMany(predicate);
 }
