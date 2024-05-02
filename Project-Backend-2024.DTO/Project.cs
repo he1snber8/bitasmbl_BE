@@ -1,4 +1,6 @@
 ﻿
+using Project_Backend_2024.DTO.Interfaces;
+
 namespace Project_Backend_2024.DTO;
 
 public class Project : IEntity, IDeletable

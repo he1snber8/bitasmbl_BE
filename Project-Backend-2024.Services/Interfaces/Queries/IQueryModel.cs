@@ -1,4 +1,4 @@
-﻿using Project_Backend_2024.DTO;
+﻿using Project_Backend_2024.DTO.Interfaces;
 using System.Linq.Expressions;
 
 namespace Project_Backend_2024.Services.Interfaces.Queries;

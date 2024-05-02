@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Project_Backend_2024.DTO;
+using Project_Backend_2024.DTO.Interfaces;
 
 public abstract class DbEntitySetter<TEntity, TDbContext>
     where TEntity : class, IEntity

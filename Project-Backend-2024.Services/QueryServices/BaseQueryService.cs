@@ -1,6 +1,6 @@
 ﻿
 using AutoMapper;
-using Project_Backend_2024.DTO;
+using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services.Interfaces.Queries;
 using System.Linq.Expressions;
