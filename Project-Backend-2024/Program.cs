@@ -2,18 +2,22 @@ using Project_Backend_2024;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register services
 builder.Services.RegisterServices(builder.Configuration);
+
+// Add controllers and API explorer
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Add Swagger
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-Startup.UseSwagger(app);
-
-//app.UseSerilogRequestLogging();
+// Middleware pipeline
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseSwagger();
 app.MapControllers();
 
 app.Run();
