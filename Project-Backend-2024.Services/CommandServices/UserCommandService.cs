@@ -27,6 +27,10 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
     {
         User user = _repository.Set(m => m.Username == loginModel.Username).SingleOrDefault() ?? throw new ArgumentNullException();
 
-        return (loginModel.Password.HashEquals(user.Password), user);
+        user.LastLogin = DateTime.Now;
+
+        _unitOfWork.SaveChanges();
+
+        return (loginModel.Password!.HashEquals(user.Password), user);
     }
 }
