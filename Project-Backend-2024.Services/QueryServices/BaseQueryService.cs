@@ -1,15 +1,19 @@
 ﻿
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.Interfaces;
+using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Interfaces.Queries;
+using System;
 using System.Linq.Expressions;
 
 namespace Project_Backend_2024.Services.QueryServices;
 
-public abstract class BaseQueryService<TEntity, TRepository> : IQueryModel<TEntity>
+public abstract class BaseQueryService<TEntity, TEntityModel,TRepository> : IQueryModel<TEntity, TEntityModel>
     where TEntity : class, IEntity
     where TRepository : IRepositoryBase<TEntity>
+    where TEntityModel : class, IEntityModel
 {
     protected readonly IMapper _mapper;
     protected readonly IUnitOfWork _unitOfWork;
@@ -22,12 +26,22 @@ public abstract class BaseQueryService<TEntity, TRepository> : IQueryModel<TEnti
         _repository = repository;
     }
 
-    public TEntity GetById(int id) =>
-        _repository.Set(u => u.Id == id).SingleOrDefault() ?? throw new NotImplementedException();
+    public TEntityModel GetById(int id) => _mapper.Map<TEntityModel>(_repository.Set(u => u.Id == id).SingleOrDefault());
 
-    public IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate) => _repository.Set(predicate);
+    public virtual IQueryable<TEntityModel> Set(Expression<Func<TEntity, bool>> predicate)
+    {
+        return _repository.Set(predicate).ProjectTo<TEntityModel>(_mapper.ConfigurationProvider);
+    }
 
-    public async Task<IEnumerable<TEntity>> GetAll() => await _repository.GetAll();
+    public async Task<List<TEntityModel>> GetAll()
+    {
+        var entities = await _repository.GetAll();
 
-    public Task<IEnumerable<TEntity>> SetMany(Expression<Func<TEntity, bool>> predicate) => _repository.SetMany(predicate);
+        var models = _mapper.Map<List<TEntityModel>>(entities);
+
+        return models;
+    }
+
+    public IQueryable<TEntityModel> Set() => _repository.Set().ProjectTo<TEntityModel>(_mapper.ConfigurationProvider);
+
 }
