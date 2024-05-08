@@ -3,17 +3,25 @@ using Project_Backend_2024.DTO;
 using Project_Backend_2024.Facade.Exceptions;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Facade.Models;
-using Project_Backend_2024.Services.TokenGenerators.Interfaces;
+using Project_Backend_2024.Facade.Responses;
+using Project_Backend_2024.Services.TokenGenerators;
 
-namespace Project_Backend_2024.Controllers;
+namespace Project_Backend_2024.Controllers.CommandControllers;
 
 public class UserController : BaseCommandController<UserModel, IUserCommandService>
 {
-    private readonly IUserAccessToken _accessTokenGenerator;
+    private readonly AccessTokenGenerator _accessTokenGenerator;
+    private readonly RefreshTokenGenerator _refreshTokenGenerator;
 
-    public UserController(IUserCommandService command, IUserAccessToken accessTokenGenerator) : base(command)
-    { _accessTokenGenerator = accessTokenGenerator; }
+    public UserController(IUserCommandService command, AccessTokenGenerator accessTokenGenerator, RefreshTokenGenerator refreshTokenGenerator)
+        : base(command)
+    {
+        _accessTokenGenerator = accessTokenGenerator;
+        _refreshTokenGenerator = refreshTokenGenerator;
+    }
 
+
+    [HttpPost("register")]
     public override async Task<IActionResult> Insert([FromBody] UserModel model)
     {
         try
@@ -41,9 +49,14 @@ public class UserController : BaseCommandController<UserModel, IUserCommandServi
 
         if (isAuthenticated)
         {
-           string token = _accessTokenGenerator.GenerateToken(user);
+            string token = _accessTokenGenerator.GenerateToken(user);
+            string refreshToken = _refreshTokenGenerator.GenerateRefreshToken();
 
-           return Ok(token);
+            return Ok(new AuthenticatedUserResponse
+            {
+                AccessToken = token,
+                RefreshToken = refreshToken
+            });
         }
 
         return Unauthorized();

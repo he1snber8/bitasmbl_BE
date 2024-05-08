@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Project-Backend-2024.DTO\Project-Backend-2024.DTO.csproj" />
     <ProjectReference Include="..\Project-Backend-2024.Facade\Project-Backend-2024.Facade.csproj" />
+    <ProjectReference Include="..\Project-Backend-2024.InterfaceGateway\Project-Backend-2024.Interface.csproj" />
   </ItemGroup>
 
 </Project>
