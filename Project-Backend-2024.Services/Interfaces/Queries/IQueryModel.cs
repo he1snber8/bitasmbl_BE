@@ -1,13 +1,15 @@
 ﻿using Project_Backend_2024.DTO.Interfaces;
+using Project_Backend_2024.Facade.Models;
 using System.Linq.Expressions;
 
 namespace Project_Backend_2024.Services.Interfaces.Queries;
 
-public interface IQueryModel<TEntity>
+public interface IQueryModel<TEntity,TEntityModel>
     where TEntity : class, IEntity
+    where TEntityModel : class, IEntityModel
 {
-    TEntity GetById(int id);
-    IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate);
-    Task<IEnumerable<TEntity>> GetAll();
-    Task<IEnumerable<TEntity>> SetMany(Expression<Func<TEntity, bool>> predicate);
+    TEntityModel GetById(int id);
+    IQueryable<TEntityModel> Set(Expression<Func<TEntity, bool>> predicate);
+    IQueryable<TEntityModel> Set();
+    Task<List<TEntityModel>> GetAll();
 }

@@ -2,12 +2,11 @@
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Facade.Models;
 
-namespace Project_Backend_2024.Controllers;
+namespace Project_Backend_2024.Controllers.CommandControllers;
 
 public class UserSkillsController : BaseCommandController<UserSkillsModel, IUserSkillsCommandService>
 {
     public UserSkillsController(IUserSkillsCommandService commandService) : base(commandService) { }
-
 }
 
 public class ProjectController : BaseCommandController<ProjectModel, IProjectCommandService>

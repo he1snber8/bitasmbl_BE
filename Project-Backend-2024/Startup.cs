@@ -10,7 +10,6 @@ using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Interfaces.Queries;
 using Project_Backend_2024.Services.QueryServices;
 using Project_Backend_2024.Services.TokenGenerators;
-using Project_Backend_2024.Services.TokenGenerators.Interfaces;
 using System.Text;
 
 namespace Project_Backend_2024;
@@ -65,7 +64,8 @@ internal static class Startup
         services.AddScoped<IUserQueryService, UserQueryService>();
 
         // Register other services
-        services.AddSingleton<IUserAccessToken, AccessTokenGenerator>();
+        services.AddSingleton<AccessTokenGenerator>();
+        services.AddSingleton<RefreshTokenGenerator>();
         services.AddControllers();
         services.AddAutoMapper(typeof(Mappers).Assembly);
 

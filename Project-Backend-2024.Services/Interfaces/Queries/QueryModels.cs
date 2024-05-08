@@ -1,14 +1,15 @@
 ﻿
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.Facade.Models;
 
 namespace Project_Backend_2024.Services.Interfaces.Queries;
 
-public interface IUserQueryService : IQueryModel<User> { }
+public interface IUserQueryService : IQueryModel<User, UserModel> { }
 
-public interface IProjectQueryService : IQueryModel<Project> { }
+public interface IProjectQueryService : IQueryModel<Project, ProjectModel> { }
 
-public interface IAppliedProjectQueryService : IQueryModel<AppliedProject> { }
+public interface IAppliedProjectQueryService : IQueryModel<AppliedProject, AppliedProjectModel> { }
 
-public interface IUserSkillsQueryService : IQueryModel<UserSkills> { }
+public interface IUserSkillsQueryService : IQueryModel<UserSkills, UserSkillsModel> { }
 
-public interface ISkillQueryService : IQueryModel<Skill> { }
+public interface ISkillQueryService : IQueryModel<Skill, SkillModel> { }

@@ -9,14 +9,13 @@ public class Mappers : Profile
     public Mappers()
     {
         CreateMap<User, UserModel>();
-        CreateMap<UserModel, User>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); //UserModel only maps properties to User that are not null
-        
+        CreateMap<UserModel, User>();/*.ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));*/ //UserModel only maps properties to User that are not null
 
         CreateMap<Project, ProjectModel>();
-        CreateMap<ProjectModel, Project>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
+        CreateMap<ProjectModel, Project>();/*.ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+*/
         CreateMap<AppliedProject, AppliedProjectModel>();
-        CreateMap<AppliedProjectModel, AppliedProject>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<AppliedProjectModel, AppliedProject>();/*.ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));*/
 
         CreateMap<UserSkills, UserSkillsModel>();
         CreateMap<UserSkillsModel, UserSkills>();

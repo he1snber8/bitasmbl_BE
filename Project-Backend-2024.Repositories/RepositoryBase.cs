@@ -19,6 +19,8 @@ namespace Project_Backend_2024.Repositories
 
         public IQueryable<TEntity> Set(Expression<Func<TEntity, bool>> predicate) => _dbSet.Where(predicate);
 
+        public IQueryable<TEntity> Set() => _dbSet;
+
         public void Insert(TEntity entity)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
@@ -47,9 +49,7 @@ namespace Project_Backend_2024.Repositories
             _dbSet.Remove(entity);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll() => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
-
-        public async Task<IEnumerable<TEntity>> SetMany(Expression<Func<TEntity, bool>> predicate) => await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
+        public async Task<List<TEntity>> GetAll() => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
 
     }
 }
