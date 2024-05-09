@@ -5,5 +5,5 @@ using Project_Backend_2024.Repositories;
 
 public class UserRepository : RepositoryBase<User>, IUserRepository
 {
-    public UserRepository(DatabaseContext context) : base(context) { _dbSet.AsNoTracking(); }
+    public UserRepository(DatabaseContext context) : base(context) { }
 }
