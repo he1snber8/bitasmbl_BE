@@ -10,25 +10,25 @@ public class UserController : BaseQueryController<User, UserModel, IUserQuerySer
     public UserController(IUserQueryService queryModel) : base(queryModel) { }
  
     [HttpGet("get/{orderby}")]
-    public IActionResult GetQuery(string orderby)
+    public ActionResult<IOrderedQueryable<UserModel>> GetQuery(string orderby)
     {
-        IOrderedQueryable<UserModel> userModels;
-
-        switch (orderby.ToLower())
+        try
         {
-            case "id":
-                userModels = _queryModel.Set().OrderBy(m => m.Id);
-                break;
-            case "username":
-                userModels = _queryModel.Set().OrderBy(m => m.Username);
-                break;
-            case "lastlogin":
-                userModels = _queryModel.Set().OrderByDescending(m => m.LastLogin);
-                break;
-            default:
-                return BadRequest("Invalid orderBy parameter.");
+            switch (orderby.ToLower())
+            {
+                case "id":
+                    return Ok(_queryModel.Set().OrderBy(m => m.Id).ToList());
+                case "username":
+                    return Ok(_queryModel.Set().OrderBy(m => m.Username).ToList());               
+                case "lastlogin":
+                    return Ok(_queryModel.Set().OrderByDescending(m => m.LastLogin).ToList());                  
+                default:
+                    return BadRequest("Invalid parameter.");
+            }
         }
-
-        return Ok(userModels.ToList());
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
