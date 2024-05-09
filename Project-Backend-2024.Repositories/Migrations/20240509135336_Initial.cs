@@ -31,9 +31,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Username = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: true),
-                    Password = table.Column<byte[]>(type: "varbinary(MAX)", nullable: true),
-                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
+                    Username = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
+                    Password = table.Column<byte[]>(type: "varbinary(MAX)", nullable: false),
+                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     Picture = table.Column<byte[]>(type: "VARBINARY(MAX)", nullable: true),
                     Bio = table.Column<string>(type: "NVARCHAR(255)", maxLength: 255, nullable: true),
                     DateJoined = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
@@ -51,8 +51,8 @@ namespace Project_Backend_2024.Repositories.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, defaultValueSql: "'Active'"),
                     DateCreated = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
                     PrincipalID = table.Column<int>(type: "int", nullable: false)
@@ -63,6 +63,26 @@ namespace Project_Backend_2024.Repositories.Migrations
                     table.ForeignKey(
                         name: "FK_Projects_Users_PrincipalID",
                         column: x => x.PrincipalID,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserID",
+                        column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -130,13 +150,24 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "IX_Projects_Name",
                 table: "Projects",
                 column: "Name",
-                unique: true,
-                filter: "[Name] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_PrincipalID",
                 table: "Projects",
                 column: "PrincipalID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_Token",
+                table: "RefreshTokens",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserID",
+                table: "RefreshTokens",
+                column: "UserID",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Skills_Name",
@@ -148,15 +179,13 @@ namespace Project_Backend_2024.Repositories.Migrations
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
-                unique: true,
-                filter: "[Email] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Username",
                 table: "Users",
                 column: "Username",
-                unique: true,
-                filter: "[Username] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserSkills_SkillID",
@@ -175,6 +204,9 @@ namespace Project_Backend_2024.Repositories.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AppliedProjects");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "UserSkills");

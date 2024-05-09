@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Project_Backend_2024.Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240428145908_Initial")]
+    [Migration("20240509135336_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -69,6 +69,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar");
 
@@ -78,6 +79,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
 
@@ -93,12 +95,37 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasFilter("[Name] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("PrincipalID");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("Project_Backend_2024.DTO.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.Skill", b =>
@@ -140,6 +167,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
 
@@ -152,24 +180,24 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("varbinary(MAX)");
 
                     b.Property<byte[]>("Picture")
                         .HasColumnType("VARBINARY(MAX)");
 
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
-                        .IsUnique()
-                        .HasFilter("[Email] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("Username")
-                        .IsUnique()
-                        .HasFilter("[Username] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -220,6 +248,17 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Project_Backend_2024.DTO.RefreshToken", b =>
+                {
+                    b.HasOne("Project_Backend_2024.DTO.User", "User")
+                        .WithOne("RefreshToken")
+                        .HasForeignKey("Project_Backend_2024.DTO.RefreshToken", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Project_Backend_2024.DTO.UserSkills", b =>
                 {
                     b.HasOne("Project_Backend_2024.DTO.Skill", "Skill")
@@ -242,6 +281,8 @@ namespace Project_Backend_2024.Repositories.Migrations
             modelBuilder.Entity("Project_Backend_2024.DTO.User", b =>
                 {
                     b.Navigation("Projects");
+
+                    b.Navigation("RefreshToken");
                 });
 #pragma warning restore 612, 618
         }

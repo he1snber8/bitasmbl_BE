@@ -99,6 +99,32 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("Project_Backend_2024.DTO.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Project_Backend_2024.DTO.Skill", b =>
                 {
                     b.Property<int>("Id")
@@ -219,6 +245,17 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Project_Backend_2024.DTO.RefreshToken", b =>
+                {
+                    b.HasOne("Project_Backend_2024.DTO.User", "User")
+                        .WithOne("RefreshToken")
+                        .HasForeignKey("Project_Backend_2024.DTO.RefreshToken", "UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Project_Backend_2024.DTO.UserSkills", b =>
                 {
                     b.HasOne("Project_Backend_2024.DTO.Skill", "Skill")
@@ -241,6 +278,8 @@ namespace Project_Backend_2024.Repositories.Migrations
             modelBuilder.Entity("Project_Backend_2024.DTO.User", b =>
                 {
                     b.Navigation("Projects");
+
+                    b.Navigation("RefreshToken");
                 });
 #pragma warning restore 612, 618
         }
