@@ -14,7 +14,8 @@ public abstract class BaseCommandController<TModel, TCommand> : Controller
 {
     protected TCommand _commandService;
 
-    public BaseCommandController(TCommand commandService) => _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+    public BaseCommandController(TCommand commandService) => 
+        _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
     [HttpPost("insert")]
     public virtual async Task<IActionResult> Insert([FromBody] TModel model)
