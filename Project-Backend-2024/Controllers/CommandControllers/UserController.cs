@@ -6,6 +6,8 @@ using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Facade.Responses;
 using Project_Backend_2024.Services.TokenGenerators;
 using Project_Backend_2024.Services.TokenValidators;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
@@ -74,10 +76,10 @@ public class UserController : Controller
                 return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
             }
 
-            else if (token.ExpirationDate < DateTime.Now)
+            else if (token.ExpirationDate < DateTime.Now || token.isActive is not true)
             {
                 await _refreshTokenRepository.Update(token.Id, new RefreshTokenModel { UserID = user.Id, Token = refreshToken,
-                    ExpirationDate = DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes) });
+                    ExpirationDate = DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes), isActive = true });
                 return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
 
             }
@@ -94,14 +96,30 @@ public class UserController : Controller
     {
         if (!_refreshTokenValidator.Validate(refreshRequest.refreshToken)) return Unauthorized();
 
-        var modelByToken = await _refreshTokenRepository.GetByToken(refreshRequest.refreshToken);
+        var tokenByToken = await _refreshTokenRepository.GetByToken(refreshRequest.refreshToken);
 
-        var user = await _userCommandService.RetrieveUser(modelByToken.UserID);
+        if (tokenByToken.isActive is not true) return Unauthorized("Operation failed due to invalid token");
+
+        var user = await _userCommandService.RetrieveUser(tokenByToken.UserID);
 
         string freshToken = _accessTokenGenerator.GenerateToken(user!);
 
-        return Ok(new AccessToken(freshToken))
+        return Ok(new AccessToken(freshToken));
+    }
+
+    [Authorize]
+    [HttpDelete("logout")]
+    public async Task<IActionResult> LogOut()
+    {
+        var userId = User.FindFirstValue("Id");
+
+        int.TryParse(userId, out int tokenId);
+
+        await _refreshTokenRepository.InvalidateTokenByUser(tokenId);
+
+        return Ok("Logged out!");
     }
 }
+
 
 
