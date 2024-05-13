@@ -19,18 +19,18 @@ public class UserController : Controller
     private readonly AccessTokenGenerator _accessTokenGenerator;
     private readonly RefreshTokenGenerator _refreshTokenGenerator;
     private readonly RefreshTokenValidator _refreshTokenValidator;
-    private readonly IRefreshTokenCommandService _refreshTokenRepository;
+    private readonly IRefreshTokenCommandService _refreshTokenCommand;
     private readonly AuthConfiguration _authConfiguration;
 
     public UserController(IUserCommandService userCommandService, AccessTokenGenerator accessTokenGenerator,
         RefreshTokenGenerator refreshTokenGenerator, RefreshTokenValidator refreshTokenValidator,
-        IRefreshTokenCommandService refreshTokenRepository, AuthConfiguration authConfiguration)
+        IRefreshTokenCommandService refreshTokenCommand, AuthConfiguration authConfiguration)
     {
         _userCommandService = userCommandService;
         _accessTokenGenerator = accessTokenGenerator;
         _refreshTokenGenerator = refreshTokenGenerator;
         _refreshTokenValidator = refreshTokenValidator;
-        _refreshTokenRepository = refreshTokenRepository;
+        _refreshTokenCommand = refreshTokenCommand;
         _authConfiguration = authConfiguration;
     }
 
@@ -59,7 +59,7 @@ public class UserController : Controller
     [HttpPost("login")]
     public async Task<IActionResult> LogIn([FromBody] UserLoginModel loginModel)
     {
-        (bool isAuthenticated, User user) = _userCommandService.AutheticateLogin(loginModel);
+        (bool isAuthenticated, User user) = await _userCommandService.AutheticateLogin(loginModel);
 
         if (isAuthenticated)
         {
@@ -67,25 +67,12 @@ public class UserController : Controller
             (_accessTokenGenerator.GenerateToken(user), 
             _refreshTokenGenerator.GenerateRefreshToken());
 
-            var token = await _refreshTokenRepository.GetByUserId(user.Id);
+            (var token,bool isAltered) = await _refreshTokenCommand.UpdateUserToken(user.Id, DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes)
+                ,refreshToken);
 
-            if (token == null)
-            {
-                await _refreshTokenRepository.Insert(new RefreshTokenModel { UserID = user.Id, Token = refreshToken, 
-                    ExpirationDate = DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes) });
-                return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
-            }
+            if (isAltered) return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
 
-            else if (token.ExpirationDate < DateTime.Now || token.isActive is not true)
-            {
-                await _refreshTokenRepository.Update(token.Id, new RefreshTokenModel { UserID = user.Id, Token = refreshToken,
-                    ExpirationDate = DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes), isActive = true });
-                return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
-
-            }
-
-            return Ok(new AuthenticatedUserResponse(freshToken, token.Token));
-            
+            else return Ok(new AuthenticatedUserResponse(freshToken, token.Token));
         }
 
         return Unauthorized();
@@ -96,7 +83,7 @@ public class UserController : Controller
     {
         if (!_refreshTokenValidator.Validate(refreshRequest.refreshToken)) return Unauthorized();
 
-        var tokenByToken = await _refreshTokenRepository.GetByToken(refreshRequest.refreshToken);
+        var tokenByToken = await _refreshTokenCommand.GetByToken(refreshRequest.refreshToken);
 
         if (tokenByToken.isActive is not true) return Unauthorized("Operation failed due to invalid token");
 
@@ -115,7 +102,7 @@ public class UserController : Controller
 
         int.TryParse(userId, out int tokenId);
 
-        await _refreshTokenRepository.InvalidateTokenByUser(tokenId);
+        await _refreshTokenCommand.InvalidateUserToken(tokenId);
 
         return Ok("Logged out!");
     }
