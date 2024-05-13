@@ -16,21 +16,33 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
 
     public override async Task<int> Insert(UserModel model)
     {
-        if (!model.ValidateUsername() || _repository.Set(m => m.Username == model.Username).SingleOrDefault() != null) throw new UsernameValidationException("Username is either in wrong format or is already in use, please ");
-        if (!model.ValidatePassword()) throw new PasswordValidationException("Password is in wrong format, please check again!");
-        if (!model.ValidateEmail() || _repository.Set(m => m.Email == model.Email).SingleOrDefault() != null) throw new EmailValidationException("Email is either in wrong format or is already registered, please check again!");
+        if (!model.ValidateUsername() || _repository.Set(m => m.Username == model.Username).SingleOrDefault() != null) throw new UsernameValidationException("Username format is wrong or is already in use, please check again!");
+        if (!model.ValidatePassword()) throw new PasswordValidationException("Password format is incorrect, please check again!");
+        if (!model.ValidateEmail() || _repository.Set(m => m.Email == model.Email).SingleOrDefault() != null) throw new EmailValidationException("Email format is wrong or is already registered, please check again!");
 
         return await base.Insert(model);
     }
 
-    public (bool,User) AutheticateLogin(IAuthenticatable loginModel)
+    public async Task<RegisterUserModel> Register(RegisterUserModel registerModel)
+    {
+        var model = _mapper.Map<UserModel>(registerModel);
+
+        await Insert(model);
+
+        return registerModel;
+    }
+
+    public async Task<(bool,User)> AutheticateLogin(IAuthenticatable loginModel)
     {
         User user = _repository.Set(m => m.Username == loginModel.Username).SingleOrDefault() ?? throw new ArgumentNullException();
 
         user.LastLogin = DateTime.Now;
 
-        _unitOfWork.SaveChanges();
+        await _unitOfWork.SaveChangesAsync();
 
-        return (loginModel.Password!.HashEquals(user.Password), user);
+        return (loginModel.Password.HashEquals(user.Password), user);
     }
+
+    public async Task<User?> RetrieveUser(int id) => await Task.FromResult(_repository.Set(u => u.Id == id).FirstOrDefault());
+
 }
