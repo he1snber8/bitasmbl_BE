@@ -61,4 +61,5 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
 
         await _unitOfWork.SaveChangesAsync();
     }
+
 }
