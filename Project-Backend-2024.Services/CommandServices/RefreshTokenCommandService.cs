@@ -41,7 +41,7 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
     {
         bool isAltered = false;
 
-        (bool isNull, bool IsUnactiveOrExpired, RefreshToken token) = await CheckTokenHealth(userId);
+        (bool isNull, bool IsUnactiveOrExpired, RefreshToken? token) = await CheckTokenHealth(userId);
 
         if (isNull)
         {
@@ -58,7 +58,7 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
 
         else if (IsUnactiveOrExpired)
         {
-            token.isActive = isActive;
+            token!.isActive = isActive;
             token.Token = updateToken;
             token.ExpirationDate = ExpirationDate;
             isAltered = true;
@@ -66,16 +66,18 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (token,isAltered);
+        return (token!,isAltered);
     }
 
-    private async Task<(bool,bool,RefreshToken)> CheckTokenHealth(int userId)
+    private async Task<(bool,bool,RefreshToken?)> CheckTokenHealth(int userId)
     {
         var token = await GetByUserId(userId);
 
-        return (token is null, 
+        if (token is null) return (true, false, null);
+
+        return (false, 
             token!.ExpirationDate < DateTime.Now &&
-            token.isActive is false, token);
+            token!.isActive is false, token);
     }
 
 
