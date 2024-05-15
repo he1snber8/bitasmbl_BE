@@ -8,6 +8,8 @@ using Project_Backend_2024.Services.TokenGenerators;
 using Project_Backend_2024.Services.TokenValidators;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Project_Backend_2024.Services.Interfaces.Queries;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
@@ -20,11 +22,14 @@ public class UserController : Controller
     private readonly RefreshTokenGenerator _refreshTokenGenerator;
     private readonly RefreshTokenValidator _refreshTokenValidator;
     private readonly IRefreshTokenCommandService _refreshTokenCommand;
+    private readonly IRefreshTokenQueryService _refreshTokenQueryService;
+    private readonly IUserQueryService _userQueryService;
     private readonly AuthConfiguration _authConfiguration;
 
     public UserController(IUserCommandService userCommandService, AccessTokenGenerator accessTokenGenerator,
         RefreshTokenGenerator refreshTokenGenerator, RefreshTokenValidator refreshTokenValidator,
-        IRefreshTokenCommandService refreshTokenCommand, AuthConfiguration authConfiguration)
+        IRefreshTokenCommandService refreshTokenCommand, AuthConfiguration authConfiguration,
+        IRefreshTokenQueryService refreshTokenQueryService, IUserQueryService userQueryService)
     {
         _userCommandService = userCommandService;
         _accessTokenGenerator = accessTokenGenerator;
@@ -32,6 +37,8 @@ public class UserController : Controller
         _refreshTokenValidator = refreshTokenValidator;
         _refreshTokenCommand = refreshTokenCommand;
         _authConfiguration = authConfiguration;
+        _refreshTokenQueryService = refreshTokenQueryService;
+        _userQueryService = userQueryService;
     }
 
     [HttpPost("register")]
@@ -67,8 +74,8 @@ public class UserController : Controller
             (_accessTokenGenerator.GenerateToken(user), 
             _refreshTokenGenerator.GenerateRefreshToken());
 
-            (var token,bool isAltered) = await _refreshTokenCommand.UpdateUserToken(user.Id, DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes)
-                ,refreshToken);
+            (var token,bool isAltered) = await _refreshTokenCommand.UpdateUserToken(user.Id,
+            DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes),refreshToken);
 
             if (isAltered) return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
 
@@ -83,15 +90,9 @@ public class UserController : Controller
     {
         if (!_refreshTokenValidator.Validate(refreshRequest.refreshToken)) return Unauthorized();
 
-        var tokenByToken = await _refreshTokenCommand.GetByToken(refreshRequest.refreshToken);
+        var user = await _refreshTokenCommand.GetUserByToken(refreshRequest);
 
-        if (tokenByToken.isActive is not true) return Unauthorized("Operation failed due to invalid token");
-
-        var user = await _userCommandService.RetrieveUser(tokenByToken.UserID);
-
-        string freshToken = _accessTokenGenerator.GenerateToken(user!);
-
-        return Ok(new AccessToken(freshToken));
+        return user == null ? Unauthorized() : Ok(new AccessToken(_accessTokenGenerator.GenerateToken(user)));
     }
 
     [Authorize]
