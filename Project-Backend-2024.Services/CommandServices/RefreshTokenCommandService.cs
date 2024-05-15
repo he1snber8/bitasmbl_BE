@@ -3,28 +3,20 @@ using Project_Backend_2024.DTO;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Facade.Models;
+using Project_Backend_2024.Services.Interfaces.Queries;
 
 namespace Project_Backend_2024.Services.CommandServices;
 
 public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, RefreshToken, IRefreshTokenRepository>, IRefreshTokenCommandService
 {
-    public RefreshTokenCommandService(IUnitOfWork unitOfWork, IMapper mapper, IRefreshTokenRepository repository) : base(unitOfWork, mapper, repository) { }
-
-    public async Task<RefreshToken> GetByToken(string token)
+    private readonly IRefreshTokenQueryService _refreshTokenQueryService;
+    private readonly IUserQueryService _userQueryService;
+    
+    public RefreshTokenCommandService(IUnitOfWork unitOfWork, IMapper mapper, IRefreshTokenRepository repository,
+        IRefreshTokenQueryService refreshTokenQueryService, IUserQueryService userQueryService) : base(unitOfWork, mapper, repository)
     {
-        return await Task.FromResult(_repository.Set(u => u.Token == token).FirstOrDefault()) ??
-            throw new KeyNotFoundException();
-    }
-
-    public async Task<RefreshToken> GetById(int id)
-    {
-        return await Task.FromResult(_repository.Set(u => u.Id == id).FirstOrDefault())??
-            throw new KeyNotFoundException();
-    }
-
-    public async Task<RefreshToken?> GetByUserId(int id)
-    {
-        return await Task.FromResult(_repository.Set(u => u.UserID == id).FirstOrDefault());
+        _refreshTokenQueryService = refreshTokenQueryService;
+        _userQueryService = userQueryService;
     }
 
     public async Task InvalidateUserToken(int id)
@@ -41,7 +33,7 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
     {
         bool isAltered = false;
 
-        (bool isNull, bool IsUnactiveOrExpired, RefreshToken? token) = await CheckTokenHealth(userId);
+        (bool isNull, bool IsInactiveOrExpired, RefreshToken? token) = await CheckTokenHealth(userId);
 
         if (isNull)
         {
@@ -56,7 +48,7 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
             isAltered = true;
         }
 
-        else if (IsUnactiveOrExpired)
+        else if (IsInactiveOrExpired is true)
         {
             token!.isActive = isActive;
             token.Token = updateToken;
@@ -71,13 +63,22 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
 
     private async Task<(bool,bool,RefreshToken?)> CheckTokenHealth(int userId)
     {
-        var token = await GetByUserId(userId);
+        var token = await _refreshTokenQueryService.GetByUserAsync(userId);
 
         if (token is null) return (true, false, null);
 
-        return (false, 
-            token!.ExpirationDate < DateTime.Now &&
-            token!.isActive is false, token);
+        bool IsExpiredOrInactive = token!.ExpirationDate < DateTime.Now || token!.isActive is false;
+
+        return (false, IsExpiredOrInactive, token);
+    }
+
+    public async Task<UserModel?> GetUserByToken(RefreshRequest refreshRequest)
+    {
+        var tokenByToken = await _refreshTokenQueryService.GetByTokenAsync(refreshRequest.refreshToken);
+
+        if (tokenByToken is null || (tokenByToken.isActive is not true || tokenByToken.ExpirationDate < DateTime.Now)) return null;
+
+        return await _userQueryService.GetByIdAsync(tokenByToken.UserID);
     }
 
 
