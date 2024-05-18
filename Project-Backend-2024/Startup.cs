@@ -10,6 +10,8 @@ using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Services.Interfaces.Queries;
 using Project_Backend_2024.Services.QueryServices;
 using Project_Backend_2024.Services.TokenGenerators;
+using Project_Backend_2024.Services.TokenValidators;
+using Serilog;
 using System.Text;
 
 namespace Project_Backend_2024;
@@ -24,9 +26,9 @@ internal static class Startup
         configuration.Bind("JWT", authConfiguration);
         services.AddSingleton(authConfiguration);
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(bearer =>
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opts =>
         {
-            bearer.TokenValidationParameters = new TokenValidationParameters()
+            opts.TokenValidationParameters = new TokenValidationParameters()
             {
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfiguration.Key)),
                 ValidIssuer = authConfiguration.Issuer,
@@ -38,6 +40,7 @@ internal static class Startup
 
             };
         });
+
 
         // Add database context
         services.AddDbContext<DatabaseContext>(options =>
@@ -52,24 +55,35 @@ internal static class Startup
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<IAppliedProjectRepository, AppliedProjectRepository>();
         services.AddScoped<IUserSkillsRepository, UserSkillsRepository>();
-
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         // Register command services
         services.AddScoped<IUserCommandService, UserCommandService>();
         services.AddScoped<IProjectCommandService, ProjectCommandService>();
         services.AddScoped<IAppliedProjectCommandService, AppliedProjectCommandService>();
         services.AddScoped<ISkillCommandService, SkillCommandService>();
         services.AddScoped<IUserSkillsCommandService, UserSkillsCommandService>();
+        services.AddScoped<IRefreshTokenCommandService, RefreshTokenCommandService>();
 
         // Register query services
         services.AddScoped<IUserQueryService, UserQueryService>();
+        services.AddScoped<IRefreshTokenQueryService, RefreshTokenQueryService>();
 
         // Register other services
         services.AddSingleton<AccessTokenGenerator>();
         services.AddSingleton<RefreshTokenGenerator>();
+        services.AddSingleton<RefreshTokenValidator>();
         services.AddControllers();
         services.AddAutoMapper(typeof(Mappers).Assembly);
 
         return services;
+    }
+
+    internal static void ConfigureSerilog(this WebApplicationBuilder webApplicationBuilder, IConfiguration configuration)
+    {
+        webApplicationBuilder.Host.UseSerilog((context,config) =>
+        {
+            config.ReadFrom.Configuration(configuration.GetSection("Serilog"));
+        });
     }
 
     internal static void AddSwagger(this WebApplication app)
