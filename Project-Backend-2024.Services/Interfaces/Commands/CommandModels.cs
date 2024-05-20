@@ -7,7 +7,8 @@ namespace Project_Backend_2024.Services.Interfaces.Commands;
 
 public interface IUserCommandService : ICommandModel<UserModel>
 {
-    (bool,User) AutheticateLogin(IAuthenticatable loginModel);
+    Task<(bool, UserModel)> AutheticateLogin(IAuthenticatable loginModel);
+    Task<RegisterUserModel> Register(RegisterUserModel registerModel);
 }
 
 public interface IProjectCommandService : ICommandModel<ProjectModel> { }
@@ -18,6 +19,9 @@ public interface IUserSkillsCommandService : ICommandModel<UserSkillsModel> { }
 
 public interface ISkillCommandService : ICommandModel<SkillModel> { }
 
-
-
-
+public interface IRefreshTokenCommandService : ICommandModel<RefreshTokenModel>
+{
+    public Task InvalidateUserToken(int id);
+    public Task<(RefreshToken,bool)> UpdateUserToken(int userId, DateTime ExpirationDate, string updateToken, bool isActive = true);
+    public Task<UserModel?> GetUserByToken(RefreshRequest refreshRequest);
+}

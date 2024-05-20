@@ -12,27 +12,28 @@ using Project_Backend_2024.Services.Interfaces.Queries;
 using System.Reflection.Metadata.Ecma335;
 using Project_Backend_2024.Services.Authentication.Authorization;
 using Serilog;
+using Microsoft.EntityFrameworkCore;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
 [ApiController]
 [Route("commands/[controller]")]
-public class UserController : Controller
+public class UserCommandController : Controller
 {
     private readonly IUserCommandService _userCommandService;
     private readonly AccessTokenGenerator _accessTokenGenerator;
-    private readonly RefreshTokenGenerator _refreshTokenGenerator;
+    private readonly UserRefreshTokenGenerator _refreshTokenGenerator;
     private readonly RefreshTokenValidator _refreshTokenValidator;
     private readonly IRefreshTokenCommandService _refreshTokenCommand;
-    private readonly IRefreshTokenQueryService _refreshTokenQueryService;
-    private readonly IUserQueryService _userQueryService;
-    private readonly AuthConfiguration _authConfiguration;
-    private readonly ILogger<UserController> _logger;
+    //private readonly IRefreshTokenQueryService _refreshTokenQueryService;
+    //private readonly IUserQueryService _userQueryService;
+    private readonly UserConfiguration _authConfiguration;
+    private readonly ILogger<UserCommandController> _logger;
 
-    public UserController(IUserCommandService userCommandService, AccessTokenGenerator accessTokenGenerator,
-        RefreshTokenGenerator refreshTokenGenerator, RefreshTokenValidator refreshTokenValidator,
-        IRefreshTokenCommandService refreshTokenCommand, AuthConfiguration authConfiguration,
-        IRefreshTokenQueryService refreshTokenQueryService, IUserQueryService userQueryService, ILogger<UserController> logger)
+    public UserCommandController(IUserCommandService userCommandService, AccessTokenGenerator accessTokenGenerator,
+        UserRefreshTokenGenerator refreshTokenGenerator, RefreshTokenValidator refreshTokenValidator,
+        IRefreshTokenCommandService refreshTokenCommand, UserConfiguration authConfiguration,
+        IRefreshTokenQueryService refreshTokenQueryService, IUserQueryService userQueryService, ILogger<UserCommandController> logger)
     {
         _userCommandService = userCommandService;
         _accessTokenGenerator = accessTokenGenerator;
@@ -40,10 +41,11 @@ public class UserController : Controller
         _refreshTokenValidator = refreshTokenValidator;
         _refreshTokenCommand = refreshTokenCommand;
         _authConfiguration = authConfiguration;
-        _refreshTokenQueryService = refreshTokenQueryService;
-        _userQueryService = userQueryService;
+        //_refreshTokenQueryService = refreshTokenQueryService;
+        //_userQueryService = userQueryService;
         _logger = logger;
     }
+
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserModel model)
@@ -51,10 +53,6 @@ public class UserController : Controller
         try
         {
             await _userCommandService.Register(model);
-
-            _logger.LogInformation("{Date}: New user registered: {Username}",
-               DateTime.Now, model.Username);
-
             return Ok("User registered successfully!");
         }
         catch (UsernameValidationException ex)
@@ -81,7 +79,6 @@ public class UserController : Controller
     }
 
     [HttpPost("login")]
-    //[HasPermission(Permission.WriteAccess,Permission.ReadAccess)]
     public async Task<IActionResult> LogIn([FromBody] UserLoginModel loginModel)
     {
         (bool isAuthenticated, UserModel user) = await _userCommandService.AutheticateLogin(loginModel);
@@ -116,6 +113,7 @@ public class UserController : Controller
     }
 
     [HttpPost("refresh")]
+    [Authorize(Policy = "AdminOrUser")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest refreshRequest)
     {
         if (!_refreshTokenValidator.Validate(refreshRequest.refreshToken)) return Unauthorized();
@@ -125,8 +123,7 @@ public class UserController : Controller
         return user == null ? Unauthorized() : Ok(new AccessToken(_accessTokenGenerator.GenerateToken(user)));
     }
 
-    [Authorize]
-    [HttpDelete("logout")]
+    [Authorize(Policy = "AdminOrUser")]
     public async Task<IActionResult> LogOut()
     {
         try
@@ -145,7 +142,84 @@ public class UserController : Controller
 
         return Ok("Logged out!");
     }
+
+    [HttpDelete("delete/{id:int}")]
+    [Authorize(Policy = "AdminOnly")]
+    public virtual async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        try
+        {
+            await _userCommandService.Delete(id);
+        }
+        catch (DbUpdateException ex)
+        {
+            return BadRequest($"Database failed: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest($"Invalid operation: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Delete operation failed: {ex.Message}");
+        }
+        return Ok("Entity deleted successfully!");
+    }
+
+
 }
 
 
+[ApiController]
+[Route("commands/[controller]")]
+public class AdminController : Controller
+{
+    private readonly IUserCommandService _userCommandService;
+    private readonly AdminTokenGenerator _tokenGenerator;
+    private readonly AdminRefreshTokenGenerator _refreshTokenGenerator;
 
+    public AdminController(IUserCommandService userCommandService, AdminTokenGenerator adminTokenGenerator, AdminRefreshTokenGenerator adminRefreshTokenGenerator)
+    {
+        _userCommandService = userCommandService;
+        _tokenGenerator = adminTokenGenerator;
+        _refreshTokenGenerator = adminRefreshTokenGenerator;
+    }
+
+    [HttpPost("RegisterAdmin")]
+    public async Task<IActionResult> SetUpAdmin([FromBody] RegisterUserModel model)
+    {
+        try
+        {
+           return Ok(await _userCommandService.Register(model));
+        }
+        catch (Exception)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPost("RegisterAdmin")]
+    public async Task<IActionResult> LoginAdmin([FromBody] UserLoginModel model)
+    {
+        try
+        {
+            (bool isAuthenticated, UserModel admin) = await _userCommandService.AutheticateLogin(model);
+
+            if (isAuthenticated)
+            {
+                (string freshToken, string refreshToken) =
+                    (_tokenGenerator.GenerateToken(admin),
+                    _refreshTokenGenerator.GenerateRefreshToken());
+
+                _tokenGenerator.GenerateToken(admin);
+                return Ok(new AuthenticatedAdminResponse(freshToken, refreshToken));
+            }
+
+            return Unauthorized();
+        }
+        catch (Exception)
+        {
+            return BadRequest();
+        }
+    }
+}

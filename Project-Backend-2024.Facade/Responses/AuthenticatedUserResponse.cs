@@ -1,7 +1,5 @@
 ﻿namespace Project_Backend_2024.Facade.Responses;
 
-public class AuthenticatedUserResponse
-{
-    public string? AccessToken { get; set; }
-    public string? RefreshToken { get; set; }
-}
+public record AuthenticatedUserResponse(string AccessToken, string RefreshToken);
+
+public record AuthenticatedAdminResponse(string AccessToken, string RefreshToken);

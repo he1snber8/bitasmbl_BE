@@ -6,11 +6,6 @@ using Project_Backend_2024.Services.Interfaces.Queries;
 
 namespace Project_Backend_2024.Services.QueryServices;
 
-public class UserQueryService : BaseQueryService<User, UserModel, IUserRepository>, IUserQueryService
-{
-    public UserQueryService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository repository) : base(unitOfWork, mapper, repository) { }
-}
-
 public class ProjectQueryService : BaseQueryService<Project, ProjectModel, IProjectRepository>, IProjectQueryService
 {
     public ProjectQueryService(IUnitOfWork unitOfWork, IMapper mapper, IProjectRepository repository) : base(unitOfWork, mapper, repository) { }

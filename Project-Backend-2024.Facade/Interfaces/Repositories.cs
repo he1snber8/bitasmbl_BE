@@ -11,3 +11,5 @@ public interface IUserSkillsRepository : IRepositoryBase<UserSkills> { }
 public interface IProjectRepository : IRepositoryBase<Project> { }
 
 public interface IAppliedProjectRepository : IRepositoryBase<AppliedProject> { }
+
+public interface IRefreshTokenRepository : IRepositoryBase<RefreshToken> { }   

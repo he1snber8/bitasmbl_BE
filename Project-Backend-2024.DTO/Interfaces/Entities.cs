@@ -10,4 +10,4 @@ public interface IAuthenticatable /* interface for authenticatable entities like
     string Password { get; set; }
 }
 
-public interface IMailApplicable { string? Email { get; set; } }
+public interface IMailApplicable { string Email { get; set; } }

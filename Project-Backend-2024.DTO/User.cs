@@ -15,5 +15,6 @@ public class User : IEntity, IAuthenticatable, IDeletable, IMailApplicable
     public DateTime? LastLogin { get; set; }
 
     public ICollection<Project>? Projects { get; set; }
+    public RefreshToken? RefreshToken { get; set; }
 
 }
