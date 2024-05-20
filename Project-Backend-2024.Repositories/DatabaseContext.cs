@@ -11,6 +11,7 @@ public class DatabaseContext : DbContext
     public DbSet<Project> Projects { get; set; }
     public DbSet<Skill> Skills { get; set; }
     public DbSet<UserSkills> UserSkills { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,6 +20,7 @@ public class DatabaseContext : DbContext
         modelBuilder.ApplyConfiguration(new AppliedProjectConfiguration());
         modelBuilder.ApplyConfiguration(new SkillsConfiguration());
         modelBuilder.ApplyConfiguration(new UserSkillsConfiguration());
+        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
     }
 
 }

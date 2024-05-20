@@ -6,13 +6,14 @@ using System.Text;
 
 namespace Project_Backend_2024.Services.TokenGenerators;
 
-public abstract class TokenGenerator
+public abstract class TokenGenerator<TConfiguration>
+    where TConfiguration : AuthConfiguration
 {
-    protected readonly AuthConfiguration _authConfiguration;
+    protected readonly TConfiguration _configuration;
 
-    protected TokenGenerator(AuthConfiguration authConfiguration)
+    protected TokenGenerator(TConfiguration authConfiguration)
     {
-        _authConfiguration = authConfiguration;
+        _configuration = authConfiguration;
     }
 
     internal virtual string GenerateToken(string Key,string Issuer,string Audience,double AccessTokenExpirationMinutes, IEnumerable<Claim>? claims = null)

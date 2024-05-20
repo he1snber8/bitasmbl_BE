@@ -10,5 +10,8 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 
         builder.HasIndex(t => t.Token)
             .IsUnique();
+
+        builder.Property(a => a.isActive)
+        .HasDefaultValue(true);
     }
 }

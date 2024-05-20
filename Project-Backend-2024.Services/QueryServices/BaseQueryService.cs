@@ -5,7 +5,6 @@ using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Interfaces.Queries;
-using System;
 using System.Linq.Expressions;
 
 namespace Project_Backend_2024.Services.QueryServices;
@@ -26,7 +25,7 @@ public abstract class BaseQueryService<TEntity, TEntityModel,TRepository> : IQue
         _repository = repository;
     }
 
-    public TEntityModel GetById(int id) => _mapper.Map<TEntityModel>(_repository.Set(u => u.Id == id).SingleOrDefault());
+    public async Task<TEntityModel> GetByIdAsync(int id) => await _mapper.Map<Task<TEntityModel>>(_repository.Set(u => u.Id == id).SingleOrDefault());
 
     public virtual IQueryable<TEntityModel> Set(Expression<Func<TEntity, bool>> predicate)
     {
@@ -43,5 +42,4 @@ public abstract class BaseQueryService<TEntity, TEntityModel,TRepository> : IQue
     }
 
     public IQueryable<TEntityModel> Set() => _repository.Set().ProjectTo<TEntityModel>(_mapper.ConfigurationProvider);
-
 }

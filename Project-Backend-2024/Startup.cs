@@ -22,17 +22,21 @@ internal static class Startup
     internal static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Bind JWT configuration
-        var authConfiguration = new AuthConfiguration();
-        configuration.Bind("JWT", authConfiguration);
-        services.AddSingleton(authConfiguration);
+        var userAuthConfiguration = new UserConfiguration();
+        configuration.Bind("JWT", userAuthConfiguration);
+        services.AddSingleton(userAuthConfiguration);
+
+        var adminAuthConfiguration = new AdminConfiguration();
+        configuration.Bind("Admin", adminAuthConfiguration);
+        services.AddSingleton(adminAuthConfiguration);
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opts =>
         {
             opts.TokenValidationParameters = new TokenValidationParameters()
             {
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfiguration.Key)),
-                ValidIssuer = authConfiguration.Issuer,
-                ValidAudience = authConfiguration.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(userAuthConfiguration.Key)),
+                ValidIssuer = userAuthConfiguration.Issuer,
+                ValidAudience = userAuthConfiguration.Audience,
                 ValidateIssuerSigningKey = true,
                 ValidateIssuer = true,
                 ValidateAudience = true,
@@ -41,6 +45,12 @@ internal static class Startup
             };
         });
 
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+            options.AddPolicy("AdminOrUser", policy => policy.RequireRole("Admin", "User"));
+        });
 
         // Add database context
         services.AddDbContext<DatabaseContext>(options =>
@@ -70,7 +80,7 @@ internal static class Startup
 
         // Register other services
         services.AddSingleton<AccessTokenGenerator>();
-        services.AddSingleton<RefreshTokenGenerator>();
+        services.AddSingleton<UserRefreshTokenGenerator>();
         services.AddSingleton<RefreshTokenValidator>();
         services.AddControllers();
         services.AddAutoMapper(typeof(Mappers).Assembly);

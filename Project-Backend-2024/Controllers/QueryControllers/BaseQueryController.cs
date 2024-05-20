@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Interfaces.Queries;
-using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Project_Backend_2024.Controllers.QueryControllers;
 
@@ -21,16 +20,25 @@ public abstract class BaseQueryController<TEntity, TEntityModel, TQueryModel> : 
         _queryModel = queryModel;   
     }
 
+    [Authorize]
     [HttpGet("get")]
-    public virtual async Task<List<TEntityModel>> GetAll()
+    public virtual async Task<ActionResult<List<TEntityModel>>> GetAll()
     {
-       return await _queryModel.GetAll();
+        try
+        {
+            return Ok(await _queryModel.GetAll());
+        }
+        catch
+        {
+            return Unauthorized("You are an unauthorized");
+        }
+       
     }
 
     [HttpGet("get/{id:int}")]
-    public virtual TEntityModel GetById([FromRoute] int id)
+    public virtual async Task<ActionResult<TEntityModel>> GetById([FromRoute] int id)
     {
-        return _queryModel.GetById(id);
+        return Ok( await _queryModel.GetByIdAsync(id));
     }
 
 }

@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_Backend_2024.DTO;
 using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Interfaces.Queries;
 
 namespace Project_Backend_2024.Controllers.QueryControllers;
 
-public class UserController : BaseQueryController<User, UserModel, IUserQueryService>
+public class UserQueryController : BaseQueryController<User, UserModel, IUserQueryService>
 {
-    public UserController(IUserQueryService queryModel) : base(queryModel) { }
+    public UserQueryController(IUserQueryService queryModel) : base(queryModel) { }
  
     [HttpGet("get/{orderby}")]
+    [Authorize(Policy = "UserOnly")]
     public ActionResult<IOrderedQueryable<UserModel>> GetQuery([FromRoute]string orderby)
     {
         try

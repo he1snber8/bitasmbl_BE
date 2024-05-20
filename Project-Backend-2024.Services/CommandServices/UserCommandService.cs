@@ -32,7 +32,7 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
         return registerModel;
     }
 
-    public async Task<(bool,User)> AutheticateLogin(IAuthenticatable loginModel)
+    public async Task<(bool,UserModel)> AutheticateLogin(IAuthenticatable loginModel)
     {
         User user = _repository.Set(m => m.Username == loginModel.Username).SingleOrDefault() ?? throw new ArgumentNullException();
 
@@ -40,9 +40,9 @@ public class UserCommandService : BaseCommandService<UserModel, User, IUserRepos
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (loginModel.Password.HashEquals(user.Password), user);
-    }
+        var model = _mapper.Map<UserModel>(user);
 
-    public async Task<User?> RetrieveUser(int id) => await Task.FromResult(_repository.Set(u => u.Id == id).FirstOrDefault());
+        return (loginModel.Password.HashEquals(model.Password), model);
+    }
 
 }
