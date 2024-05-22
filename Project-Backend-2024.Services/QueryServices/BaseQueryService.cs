@@ -1,11 +1,11 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Interfaces.Queries;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Project_Backend_2024.Services.QueryServices;
 
@@ -25,7 +25,11 @@ public abstract class BaseQueryService<TEntity, TEntityModel,TRepository> : IQue
         _repository = repository;
     }
 
-    public async Task<TEntityModel> GetByIdAsync(int id) => await _mapper.Map<Task<TEntityModel>>(_repository.Set(u => u.Id == id).SingleOrDefault());
+    public virtual async Task<TEntityModel> GetByIdAsync(int id)
+    {
+        var entity = await _repository.Set(u => u.Id == id).SingleOrDefaultAsync();
+        return _mapper.Map<TEntityModel>(entity);
+    }
 
     public virtual IQueryable<TEntityModel> Set(Expression<Func<TEntity, bool>> predicate)
     {
