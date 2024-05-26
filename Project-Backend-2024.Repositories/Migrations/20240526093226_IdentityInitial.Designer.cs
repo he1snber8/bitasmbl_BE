@@ -11,15 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Project_Backend_2024.Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240512145315_12.05.24")]
-    partial class _120524
+    [Migration("20240526093226_IdentityInitial")]
+    partial class IdentityInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.15")
+                .HasAnnotation("ProductVersion", "7.0.19")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -44,8 +44,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Property<int>("ProjectID")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasIndex("UserID");
 
@@ -83,8 +84,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
 
-                    b.Property<int>("PrincipalID")
-                        .HasColumnType("int");
+                    b.Property<string>("PrincipalID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Status")
                         .ValueGeneratedOnAdd()
@@ -117,8 +119,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool?>("isActive")
                         .ValueGeneratedOnAdd()
@@ -159,15 +162,18 @@ namespace Project_Backend_2024.Repositories.Migrations
 
             modelBuilder.Entity("Project_Backend_2024.DTO.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Bio")
                         .HasMaxLength(255)
                         .HasColumnType("NVARCHAR");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DateJoined")
                         .ValueGeneratedOnAdd()
@@ -179,6 +185,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
 
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -187,14 +196,38 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime");
 
-                    b.Property<string>("Password")
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("varbinary(MAX)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("Picture")
                         .HasColumnType("VARBINARY(MAX)");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar");
@@ -204,7 +237,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("Username")
+                    b.HasIndex("UserName")
                         .IsUnique();
 
                     b.ToTable("Users");
@@ -215,8 +248,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Property<int>("SkillID")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasIndex("SkillID");
 
