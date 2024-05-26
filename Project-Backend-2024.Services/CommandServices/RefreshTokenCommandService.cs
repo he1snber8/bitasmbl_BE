@@ -10,16 +10,16 @@ namespace Project_Backend_2024.Services.CommandServices;
 public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, RefreshToken, IRefreshTokenRepository>, IRefreshTokenCommandService
 {
     private readonly IRefreshTokenQueryService _refreshTokenQueryService;
-    private readonly IUserQueryService _userQueryService;
+    //private readonly IUserQueryService _userQueryService;
     
     public RefreshTokenCommandService(IUnitOfWork unitOfWork, IMapper mapper, IRefreshTokenRepository repository,
-        IRefreshTokenQueryService refreshTokenQueryService, IUserQueryService userQueryService) : base(unitOfWork, mapper, repository)
+        IRefreshTokenQueryService refreshTokenQueryService /*IUserQueryService userQueryService*/) : base(unitOfWork, mapper, repository)
     {
         _refreshTokenQueryService = refreshTokenQueryService;
-        _userQueryService = userQueryService;
+        //_userQueryService = userQueryService;
     }
 
-    public async Task InvalidateUserToken(int id)
+    public async Task InvalidateUserToken(string id)
     {
         var token = await Task.FromResult(_repository.Set(u => u.UserID == id).FirstOrDefault())
             ?? throw new KeyNotFoundException();
@@ -29,7 +29,7 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task<(RefreshToken,bool)> UpdateUserToken(int userId, DateTime ExpirationDate,string updateToken, bool isActive = true)
+    public async Task<(RefreshToken,bool)> UpdateUserToken(string userId, DateTime ExpirationDate,string updateToken, bool isActive = true)
     {
         bool isAltered = false;
 
@@ -61,7 +61,7 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
         return (token!,isAltered);
     }
 
-    private async Task<(bool,bool,RefreshToken?)> CheckTokenHealth(int userId)
+    private async Task<(bool,bool,RefreshToken?)> CheckTokenHealth(string userId)
     {
         var token = await _refreshTokenQueryService.GetByUserAsync(userId);
 
@@ -72,14 +72,14 @@ public class RefreshTokenCommandService : BaseCommandService<RefreshTokenModel, 
         return (false, IsExpiredOrInactive, token);
     }
 
-    public async Task<UserModel?> GetUserByToken(RefreshRequest refreshRequest)
-    {
-        var tokenByToken = await _refreshTokenQueryService.GetByTokenAsync(refreshRequest.refreshToken);
+    //public async Task<UserModel?> GetUserByToken(RefreshRequest refreshRequest)
+    //{
+    //    var tokenByToken = await _refreshTokenQueryService.GetByTokenAsync(refreshRequest.refreshToken);
 
-        if (tokenByToken is null || (tokenByToken.isActive is not true || tokenByToken.ExpirationDate < DateTime.Now)) return null;
+    //    if (tokenByToken is null || (tokenByToken.isActive is not true || tokenByToken.ExpirationDate < DateTime.Now)) return null;
 
-        return await _userQueryService.GetByIdAsync(tokenByToken.UserID);
-    }
+    //    return await _userQueryService.GetByIdAsync(tokenByToken.UserID);
+    //}
 
 
 }

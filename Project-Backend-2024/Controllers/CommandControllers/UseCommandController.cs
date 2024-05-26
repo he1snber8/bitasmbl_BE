@@ -33,7 +33,7 @@ public class UserCommandController : Controller
     public UserCommandController(IUserCommandService userCommandService, AccessTokenGenerator accessTokenGenerator,
         UserRefreshTokenGenerator refreshTokenGenerator, RefreshTokenValidator refreshTokenValidator,
         IRefreshTokenCommandService refreshTokenCommand, UserConfiguration authConfiguration,
-        IRefreshTokenQueryService refreshTokenQueryService, IUserQueryService userQueryService, ILogger<UserCommandController> logger)
+        IRefreshTokenQueryService refreshTokenQueryService, /*IUserQueryService userQueryService,*/ ILogger<UserCommandController> logger)
     {
         _userCommandService = userCommandService;
         _accessTokenGenerator = accessTokenGenerator;
@@ -78,50 +78,50 @@ public class UserCommandController : Controller
         }
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> LogIn([FromBody] UserLoginModel loginModel)
-    {
-        (bool isAuthenticated, UserModel user) = await _userCommandService.AutheticateLogin(loginModel);
-        try
-        {
-            if (isAuthenticated)
-            {
-                (string freshToken, string refreshToken) =
-                    (_accessTokenGenerator.GenerateToken(user),
-                    _refreshTokenGenerator.GenerateRefreshToken());
+    //[HttpPost("login")]
+    //public async Task<IActionResult> LogIn([FromBody] UserLoginModel loginModel)
+    //{
+    //    (bool isAuthenticated, UserModel user) = await _userCommandService.AutheticateLogin(loginModel);
+    //    try
+    //    {
+    //        if (isAuthenticated)
+    //        {
+    //            (string freshToken, string refreshToken) =
+    //                (_accessTokenGenerator.GenerateToken(user),
+    //                _refreshTokenGenerator.GenerateRefreshToken());
 
-                (var token, bool isAltered) = await _refreshTokenCommand.UpdateUserToken(
-                    user.Id,
-                    DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes),
-                    refreshToken);
+    //            (var token, bool isAltered) = await _refreshTokenCommand.UpdateUserToken(
+    //                user.Id,
+    //                DateTime.Now.AddMinutes(_authConfiguration.RefreshTokenExpirationMinutes),
+    //                refreshToken);
 
-                if (isAltered) return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
+    //            if (isAltered) return Ok(new AuthenticatedUserResponse(freshToken, refreshToken));
 
-                else return Ok(new AuthenticatedUserResponse(freshToken, token.Token));
+    //            else return Ok(new AuthenticatedUserResponse(freshToken, token.Token));
 
-            }
+    //        }
 
-            return Unauthorized();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogInformation("{Date}: error while logging out: {errorMessage}",
-               DateTime.Now, ex.Message);
+    //        return Unauthorized();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogInformation("{Date}: error while logging out: {errorMessage}",
+    //           DateTime.Now, ex.Message);
 
-            return BadRequest();
-        }
-    }
+    //        return BadRequest();
+    //    }
+    //}
 
-    [HttpPost("refresh")]
-    [Authorize(Policy = "AdminOrUser")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest refreshRequest)
-    {
-        if (!_refreshTokenValidator.Validate(refreshRequest.refreshToken)) return Unauthorized();
+    //[HttpPost("refresh")]
+    //[Authorize(Policy = "AdminOrUser")]
+    //public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest refreshRequest)
+    //{
+    //    if (!_refreshTokenValidator.Validate(refreshRequest.refreshToken)) return Unauthorized();
 
-        var user = await _refreshTokenCommand.GetUserByToken(refreshRequest);
+    //    var user = await _refreshTokenCommand.GetUserByToken(refreshRequest);
 
-        return user == null ? Unauthorized() : Ok(new AccessToken(_accessTokenGenerator.GenerateToken(user)));
-    }
+    //    return user == null ? Unauthorized() : Ok(new AccessToken(_accessTokenGenerator.GenerateToken(user)));
+    //}
 
     [Authorize(Policy = "AdminOrUser")]
     public async Task<IActionResult> LogOut()
@@ -130,9 +130,7 @@ public class UserCommandController : Controller
         {
             var userId = User.FindFirstValue("Id");
 
-            int.TryParse(userId, out int tokenId);
-
-            await _refreshTokenCommand.InvalidateUserToken(tokenId);
+            await _refreshTokenCommand.InvalidateUserToken(userId!);
         }
         catch (Exception ex)
         {

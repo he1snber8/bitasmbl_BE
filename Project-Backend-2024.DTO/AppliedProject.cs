@@ -10,7 +10,7 @@ public class AppliedProject : IEntity
     public string? CoverLetter { get; set; }
 
     public User? User { get; set; }
-    public int UserID { get; set; }
+    public string UserID { get; set; }
 
     public Project? Project { get; set; }
     public int ProjectID { get; set; }

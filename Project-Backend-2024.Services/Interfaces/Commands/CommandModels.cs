@@ -21,7 +21,7 @@ public interface ISkillCommandService : ICommandModel<SkillModel> { }
 
 public interface IRefreshTokenCommandService : ICommandModel<RefreshTokenModel>
 {
-    public Task InvalidateUserToken(int id);
-    public Task<(RefreshToken,bool)> UpdateUserToken(int userId, DateTime ExpirationDate, string updateToken, bool isActive = true);
-    public Task<UserModel?> GetUserByToken(RefreshRequest refreshRequest);
+    public Task InvalidateUserToken(string id);
+    public Task<(RefreshToken,bool)> UpdateUserToken(string userId, DateTime ExpirationDate, string updateToken, bool isActive = true);
+    //public Task<UserModel?> GetUserByToken(RefreshRequest refreshRequest);
 }

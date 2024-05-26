@@ -7,7 +7,7 @@ public class UserSkills : IEntity
     public int Id { get; }
 
     public User? User { get; set; }
-    public int UserID { get; set; }
+    public string UserID { get; set; }
 
     public Skill? Skill { get; set; }
     public int SkillID { get; set; }

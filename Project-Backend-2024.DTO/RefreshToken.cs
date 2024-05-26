@@ -10,5 +10,5 @@ public class RefreshToken : IEntity
     public bool? isActive { get; set; }
 
     public User? User { get; set; }
-    public int UserID { get; set; }
+    public string UserID { get; set; } = null!;
 }
