@@ -2,7 +2,7 @@
 
 namespace Project_Backend_2024.Facade.Interfaces;
 
-public interface IUserRepository : IRepositoryBase<User> { }
+//public interface IUserRepository : IRepositoryBase<User> { }
 
 public interface ISkillRepository : IRepositoryBase<Skill> { }
 

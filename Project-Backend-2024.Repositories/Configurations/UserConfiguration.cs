@@ -11,23 +11,20 @@ namespace Project_Backend_2024.Repositories.Configurations
         {
             builder.HasKey(u => u.Id);
 
-            builder.Property(u => u.Username)
+            builder.Property(u => u.UserName)
            .HasColumnType("varchar")
            .HasMaxLength(30)
            .IsRequired();
 
-            builder.HasIndex(u => u.Username)
+            builder.HasIndex(u => u.UserName)
             .IsUnique();
 
             builder.HasIndex(u => u.Email)
             .IsUnique();
 
-            builder.Property(u => u.Password)
+            builder.Property(u => u.PasswordHash)
             .HasColumnType("varbinary(MAX)")
-            .IsRequired()
-            .HasConversion(
-            p => p!.HashData(),
-            p => p);
+            .IsRequired();
 
             builder.Property(u => u.IsDeleted)
             .HasDefaultValue(false);

@@ -13,6 +13,6 @@ public class Project : IEntity, IDeletable
     public DateTime? DateCreated { get; set; }
     
     public User? User { get; set; }
-    public int PrincipalID { get; set; }
+    public string? PrincipalID { get; set; }
 
 }

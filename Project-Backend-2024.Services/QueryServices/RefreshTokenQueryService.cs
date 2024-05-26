@@ -14,7 +14,7 @@ public class RefreshTokenQueryService : BaseQueryService<RefreshToken, RefreshTo
     public async Task<RefreshToken?> GetByTokenAsync(string token) => 
         await Task.FromResult(_repository.Set(u => u.Token == token).FirstOrDefault());
 
-    public async Task<RefreshToken?> GetByUserAsync(int userId) =>
+    public async Task<RefreshToken?> GetByUserAsync(string userId) =>
         await Task.FromResult(_repository.Set(u => u.UserID == userId).FirstOrDefault());
 
 }

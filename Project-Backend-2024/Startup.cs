@@ -60,14 +60,14 @@ internal static class Startup
 
         // Register repositories
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IUserRepository, UserRepository>();
+        //services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISkillRepository, SkillRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<IAppliedProjectRepository, AppliedProjectRepository>();
         services.AddScoped<IUserSkillsRepository, UserSkillsRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         // Register command services
-        services.AddScoped<IUserCommandService, UserCommandService>();
+        //services.AddScoped<IUserCommandService, UserCommandService>();
         services.AddScoped<IProjectCommandService, ProjectCommandService>();
         services.AddScoped<IAppliedProjectCommandService, AppliedProjectCommandService>();
         services.AddScoped<ISkillCommandService, SkillCommandService>();
@@ -75,7 +75,7 @@ internal static class Startup
         services.AddScoped<IRefreshTokenCommandService, RefreshTokenCommandService>();
 
         // Register query services
-        services.AddScoped<IUserQueryService, UserQueryService>();
+        //services.AddScoped<IUserQueryService, UserQueryService>();
         services.AddScoped<IRefreshTokenQueryService, RefreshTokenQueryService>();
 
         // Register other services

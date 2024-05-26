@@ -1,6 +1,8 @@
 ﻿namespace Project_Backend_2024.DTO.Interfaces;
 
-public interface IEntity { int Id { get; } }
+public interface IEntity<out T> { T Id { get; } }
+
+public interface IEntity :  IEntity<int> { }
 
 public interface IDeletable { bool IsDeleted { get; set; } }
 

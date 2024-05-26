@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Project-Backend-2024.InterfaceGateway\Project-Backend-2024.Interface.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

@@ -8,7 +8,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private readonly DatabaseContext _context;
     private readonly ILogger<UnitOfWork> _logger;
 
-    private readonly Lazy<IUserRepository> _userRepository;
+    //private readonly Lazy<IUserRepository> _userRepository;
     private readonly Lazy<IProjectRepository> _projectRepository;
     private readonly Lazy<IUserSkillsRepository> _userSkillsRepository;
     private readonly Lazy<ISkillRepository> _skillRepository;
@@ -18,14 +18,14 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _userRepository = new Lazy<IUserRepository>(() => new UserRepository(context));
+        //_userRepository = new Lazy<IUserRepository>(() => new UserRepository(context));
         _projectRepository = new Lazy<IProjectRepository>(() => new ProjectRepository(context));
         _userSkillsRepository = new Lazy<IUserSkillsRepository>(() => new UserSkillsRepository(context));
         _skillRepository = new Lazy<ISkillRepository>(() => new SkillRepository(context));
         _appliedProjectRepository = new Lazy<IAppliedProjectRepository>(() => new AppliedProjectRepository(context));
     }
 
-    public IUserRepository UserRepository => _userRepository.Value;
+    //public IUserRepository UserRepository => _userRepository.Value;
     public IProjectRepository ProjectRepository => _projectRepository.Value;
     public IUserSkillsRepository UserSkillsRepository => _userSkillsRepository.Value;
     public ISkillRepository SkillRepository => _skillRepository.Value;
