@@ -2,7 +2,6 @@
 
 public interface IUnitOfWork
 {
-    //IUserRepository UserRepository { get; }
     IProjectRepository ProjectRepository { get; }
     IUserSkillsRepository UserSkillsRepository { get; }
     ISkillRepository SkillRepository { get; }

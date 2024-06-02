@@ -51,10 +51,6 @@ namespace Project_Backend_2024.Repositories.Configurations
 
             builder.Property(m => m.Picture)
            .HasColumnType("VARBINARY(MAX)");
-
-            builder.HasOne(u => u.RefreshToken)
-                .WithOne(rt => rt.User)
-                .HasForeignKey<RefreshToken>(rt => rt.UserID);
         }
     }
 }
