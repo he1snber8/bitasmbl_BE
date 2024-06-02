@@ -8,20 +8,16 @@ public class Mappers : Profile
 {
     public Mappers()
     {
-        CreateMap<User, UserModel>();
-        CreateMap<UserModel, User>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); //UserModel only maps properties to User that are not null
+        CreateMap<User, UserModel>().ReverseMap().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+       //UserModel only maps properties to User that are not null
+
         CreateMap<RegisterUserModel, UserModel>();
+        CreateMap<RegisterUserModel, User>();
 
-        CreateMap<Project, ProjectModel>();
-        CreateMap<ProjectModel, Project>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<Project, ProjectModel>().ReverseMap().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-        CreateMap<AppliedProject, AppliedProjectModel>();
-        CreateMap<AppliedProjectModel, AppliedProject>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<AppliedProjectModel, AppliedProject>().ReverseMap().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-        CreateMap<UserSkills, UserSkillsModel>();
-        CreateMap<UserSkillsModel, UserSkills>();
-
-        CreateMap<RefreshTokenModel, RefreshToken>();
-
+        CreateMap<UserSkills, UserSkillsModel>().ReverseMap().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

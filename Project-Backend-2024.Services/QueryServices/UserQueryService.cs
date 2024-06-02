@@ -1,14 +1,37 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Project_Backend_2024.DTO;
-using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Interfaces.Queries;
 
 namespace Project_Backend_2024.Services.QueryServices;
 
-//public class UserQueryService : BaseQueryService<User, UserModel, IUserRepository>, IUserQueryService
-//{
-//    public UserQueryService(IUnitOfWork unitOfWork, IMapper mapper, IUserRepository repository) : base(unitOfWork, mapper, repository) { }
+public class UserQueryService : IUserQueryService
+{
+    private readonly UserManager<User> _userManager;
+    private readonly IMapper _mapper;
 
-//    public async Task<User?> RetrieveUserAsync(string id) => await Task.FromResult(_repository.Set(u => u.Id == id).FirstOrDefault());
-//}
+    public UserQueryService(UserManager<User> userManager, IMapper mapper)
+    {
+        _userManager = userManager;
+        _mapper = mapper;
+    }
+
+    public async Task<UserModel> GetByEmailAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        return _mapper.Map<UserModel>(user);
+    }
+
+    public async Task<UserModel> GetByUsernameAsync(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        return _mapper.Map<UserModel>(user);
+    }
+
+    public IQueryable<UserModel> GetAll()
+    {
+        var users = _userManager.Users;
+        return _mapper.ProjectTo<UserModel>(users);
+    }
+}

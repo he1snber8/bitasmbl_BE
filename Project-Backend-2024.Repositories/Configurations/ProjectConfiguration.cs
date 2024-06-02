@@ -1,7 +1,6 @@
 ﻿using Project_Backend_2024.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Project_Backend_2024.Facade.BasicOperations;
 
 public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 {

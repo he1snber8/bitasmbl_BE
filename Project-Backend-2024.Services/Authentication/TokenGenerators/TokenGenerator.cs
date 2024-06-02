@@ -1,22 +1,14 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Project_Backend_2024.Facade.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace Project_Backend_2024.Services.TokenGenerators;
 
-public abstract class TokenGenerator<TConfiguration>
-    where TConfiguration : AuthConfiguration
-{
-    protected readonly TConfiguration _configuration;
-
-    protected TokenGenerator(TConfiguration authConfiguration)
-    {
-        _configuration = authConfiguration;
-    }
-
-    internal virtual string GenerateToken(string Key,string Issuer,string Audience,double AccessTokenExpirationMinutes, IEnumerable<Claim>? claims = null)
+public abstract class TokenGenerator
+{ 
+    protected virtual string GenerateToken(string Key,string Issuer,string Audience,
+        double TokenExpirationMinutes, IEnumerable<Claim>? claims = null)
     {
        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key));
        SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -26,7 +18,7 @@ public abstract class TokenGenerator<TConfiguration>
            Audience,
            claims,
            DateTime.UtcNow,
-           DateTime.UtcNow.AddMinutes(AccessTokenExpirationMinutes),
+           DateTime.UtcNow.AddMinutes(TokenExpirationMinutes),
            credentials);
       
        return new JwtSecurityTokenHandler().WriteToken(token);

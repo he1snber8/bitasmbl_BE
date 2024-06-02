@@ -2,9 +2,9 @@
 
 namespace Project_Backend_2024.Facade.Models;
 
-public class UserModel : IEntityModel, IAuthenticatable, IMailApplicable
+public class UserModel : IAuthenticatable, IMailApplicable
 {
-    public int Id { get; set; }
+    public string Id { get; set; } = null!;
     public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string Password { get; set; } = null!;

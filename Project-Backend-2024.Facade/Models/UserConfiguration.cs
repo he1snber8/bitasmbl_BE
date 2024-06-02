@@ -1,6 +1,6 @@
 ﻿namespace Project_Backend_2024.Facade.Models;
 
-public abstract class AuthConfiguration
+public class AuthConfiguration
 {
     public string Key { get; set; } = null!;
     public string Issuer { get; set; } = null!;
@@ -10,7 +10,3 @@ public abstract class AuthConfiguration
     public string RefreshKey { get; set; } = null!;
     public double RefreshTokenExpirationMinutes { get; set; }
 }
-
-public class UserConfiguration : AuthConfiguration { }
-
-public class AdminConfiguration :  AuthConfiguration { }

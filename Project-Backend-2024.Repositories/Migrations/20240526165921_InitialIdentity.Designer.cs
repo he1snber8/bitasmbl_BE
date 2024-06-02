@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Project_Backend_2024.Repositories.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240526165921_InitialIdentity")]
+    partial class InitialIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,7 +186,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasIndex("ProjectID", "UserID")
                         .IsUnique();
 
-                    b.ToTable("AppliedProjects", (string)null);
+                    b.ToTable("AppliedProjects");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.Project", b =>
@@ -231,7 +234,7 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     b.HasIndex("PrincipalID");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.RefreshToken", b =>
@@ -266,7 +269,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasIndex("UserID")
                         .IsUnique();
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.Skill", b =>
@@ -287,7 +290,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Skills", (string)null);
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.User", b =>
@@ -398,7 +401,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasIndex("UserID", "SkillID")
                         .IsUnique();
 
-                    b.ToTable("UserSkills", (string)null);
+                    b.ToTable("UserSkills");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
