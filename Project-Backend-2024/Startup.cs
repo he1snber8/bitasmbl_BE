@@ -1,40 +1,28 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Project_Backend_2024.DTO;
-using Project_Backend_2024.Facade.Interfaces;
-using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services;
-using Project_Backend_2024.Services.CommandServices;
-using Project_Backend_2024.Services.Interfaces.Commands;
-using Project_Backend_2024.Services.Interfaces.Queries;
-using Project_Backend_2024.Services.QueryServices;
-using Project_Backend_2024.Services.TokenGenerators;
-using Project_Backend_2024.Services.TokenValidators;
-using Serilog;
-using System.Text;
 
 namespace Project_Backend_2024;
 
 internal static partial class Startup
 {
-    internal static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
+    internal static IServiceCollection AddConfigurations(this WebApplicationBuilder builder, IConfiguration configuration)
     {
-        services.ConfigureAuthentication(configuration);
-        services.ConfigureAuthorization(configuration);
-        services.ConfigureDatabase(configuration);
-        services.ConfigureIdentity();
-        services.ConfigureRepositories();
-        services.ConfigureServices();
-        services.AddSwaggerBearer();
+        builder.Services.ConfigureAuthentication(configuration);
+        builder.Services.ConfigureAuthorization(configuration);
+        builder.Services.ConfigureDatabase(configuration);
+        builder.Services.ConfigureIdentity();
+        builder.Services.ConfigureRepositories();
+        builder.Services.ConfigureServices();
+        builder.Services.AddSwaggerBearer();
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.ConfigureSerilog(configuration);
 
+        builder.Services.AddControllers();
+        builder.Services.AddAutoMapper(typeof(Mappers).Assembly);
 
-        services.AddControllers();
-        services.AddAutoMapper(typeof(Mappers).Assembly);
-
-        return services;
+        return builder.Services;
     }
 
     internal static void AddAppMiddleware(this WebApplication app)
@@ -43,9 +31,5 @@ internal static partial class Startup
         app.AddMiddleWare();
     }
 
-    internal static void IncludeAppSettingsConfiguration(this WebApplicationBuilder webApplicationBuilder, IConfiguration configuration)
-    {
-        webApplicationBuilder.ConfigureSerilog(configuration);
-    }
 }
         
