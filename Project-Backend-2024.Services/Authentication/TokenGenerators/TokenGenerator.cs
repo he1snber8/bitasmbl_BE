@@ -7,7 +7,7 @@ namespace Project_Backend_2024.Services.TokenGenerators;
 
 public abstract class TokenGenerator
 { 
-    protected virtual string GenerateToken(string Key,string Issuer,string Audience,
+    protected string GenerateToken(string Key,string Issuer,string Audience,
         double TokenExpirationMinutes, IEnumerable<Claim>? claims = null)
     {
        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key));
@@ -17,8 +17,8 @@ public abstract class TokenGenerator
            Issuer,
            Audience,
            claims,
-           DateTime.UtcNow,
-           DateTime.UtcNow.AddMinutes(TokenExpirationMinutes),
+           DateTime.Now,
+           DateTime.Now.AddMinutes(TokenExpirationMinutes),
            credentials);
       
        return new JwtSecurityTokenHandler().WriteToken(token);
