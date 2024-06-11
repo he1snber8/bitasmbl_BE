@@ -13,6 +13,7 @@ public class Mappers : Profile
 
         CreateMap<RegisterUserModel, UserModel>();
         CreateMap<RegisterUserModel, User>();
+        CreateMap<User, UserQueryModel>();
 
         CreateMap<Project, ProjectModel>().ReverseMap().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
