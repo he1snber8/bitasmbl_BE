@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Project_Backend_2024.Facade.Models;
-using System.Text;
+﻿using Project_Backend_2024.Facade.Models;
+using Project_Backend_2024.Services.Authentication.Authorization;
 
 namespace Project_Backend_2024;
 
@@ -13,33 +11,21 @@ internal static partial class Startup
         configuration.Bind("JWT", userAuthConfiguration);
         services.AddSingleton(userAuthConfiguration);
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(opts =>
-        {
-            opts.TokenValidationParameters = new TokenValidationParameters
-            {
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(userAuthConfiguration.Key)),
-                ValidIssuer = userAuthConfiguration.Issuer,
-                ValidAudience = userAuthConfiguration.Audience,
-                ValidateIssuerSigningKey = true,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ClockSkew = TimeSpan.Zero
-            };
+        services.AddEndpointsApiExplorer();
 
-            opts.Events = new JwtBearerEvents
+        services.AddAuthentication("MyAuthScheme")
+            .AddCookie("MyAuthScheme", options =>
             {
-                OnMessageReceived = context =>
-                {
-                    context.Request.Cookies.TryGetValue("accessToken", out var accessToken);
-                    if (!string.IsNullOrEmpty(accessToken))
-                    {
-                        context.Token = accessToken;
-                    }
+              options.LoginPath = "/Account/Login"; 
+              options.LogoutPath = "/Account/Logout";
+              //options.Cookie.HttpOnly = true;
+              //options.Cookie.SameSite = SameSiteMode.None;
+              //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
 
-                    return Task.CompletedTask;
-                }
-            };
-        });
+        services.AddHttpContextAccessor();
+
     }
 }
+
+
