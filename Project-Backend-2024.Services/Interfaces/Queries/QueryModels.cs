@@ -14,7 +14,8 @@ public interface ISkillQueryService : IQueryModel<Skill, SkillModel> { }
 
 public interface IUserQueryService
 {
-    IQueryable<UserModel> GetAll();
-    Task<UserModel> GetByEmailAsync(string email);
-    Task<UserModel> GetByUsernameAsync(string username);
+    IQueryable<UserModel> AdminGetAll();
+    IQueryable<UserQueryModel> GetAll();
+    Task<UserQueryModel> GetByEmailAsync(string email);
+    Task<UserQueryModel> GetByUsernameAsync(string username);
 }

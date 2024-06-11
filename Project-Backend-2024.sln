@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project-Backend-2024.Facade
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project-Backend-2024.Services", "Project-Backend-2024.Services\Project-Backend-2024.Services.csproj", "{8BCB60D6-720D-4B7F-A163-93D719735114}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project-Backend-2024.Interface", "Project-Backend-2024.InterfaceGateway\Project-Backend-2024.Interface.csproj", "{B4150AB5-BEDB-4BAD-A672-3843E9365530}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project-Backend-2024.Interface", "Project-Backend-2024.InterfaceGateway\Project-Backend-2024.Interface.csproj", "{B4150AB5-BEDB-4BAD-A672-3843E9365530}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
