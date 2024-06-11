@@ -8,19 +8,38 @@ internal static partial class Startup
     {
         if (app.Environment.IsDevelopment())
             app.UseSwagger();
-        app.UseSwaggerUI();
+            app.UseSwaggerUI();
     }
 
-   internal static void AddSwaggerBearer(this IServiceCollection services)
-   {
-       services.AddSwaggerGen(opts =>
-       {
-           opts.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { Scheme = "Bearer", In = ParameterLocation.Header, Type = SecuritySchemeType.Http, BearerFormat = "JWT" });
-
-           opts.AddSecurityRequirement(new OpenApiSecurityRequirement
+    internal static void AddSwaggerBearer(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(opts =>
+        {
+            opts.AddSecurityDefinition("BearerAuth", new OpenApiSecurityScheme
             {
-               { new OpenApiSecurityScheme { Reference = new OpenApiReference { Id = "Bearer", Type = ReferenceType.SecurityScheme } } , new List<string>()}
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header using the Bearer scheme."
             });
-       });
-   }
+
+            opts.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                 {
+                    new OpenApiSecurityScheme
+                     {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "BearerAuth"
+                    }
+                },
+                new List<string>()
+            }
+         });
+        });
+    }
 }
+
