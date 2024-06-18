@@ -1,6 +1,6 @@
 ﻿namespace Project_Backend_2024.Facade.Models;
 
-public class AppliedProjectModel : IEntityModel
+public class ProjectApplicationModel : IEntityModel
 {   
     public int Id { get; }
     public string? CoverLetter { get; set; }
