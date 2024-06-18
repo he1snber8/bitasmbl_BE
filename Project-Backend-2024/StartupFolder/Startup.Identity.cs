@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.Repositories;
 
-namespace Project_Backend_2024;
+namespace Project_Backend_2024.StartupFolder;
 
 internal static partial class Startup
 {

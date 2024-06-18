@@ -1,35 +1,36 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Serilog;
 
-namespace Project_Backend_2024;
+namespace Project_Backend_2024.StartupFolder;
 
 internal static partial class Startup
 {
     internal static void AddMiddleWare(this WebApplication app)
     {
-        app.UseSerilogRequestLogging();
-        app.UseRouting();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseHttpsRedirection();
-        app.UseSwagger();
-        app.UseSwaggerUI();
-        app.MapControllers();
-        app.UseStatusCodePages(async context =>
-        {
+        app.UseSerilogRequestLogging()
+            .UseRouting()
+            .UseAuthentication()
+            .UseAuthorization()
+            .UseHttpsRedirection()
+            .UseSwagger()
+            .UseSwaggerUI();
+        
+            app.MapControllers();
+            app.UseStatusCodePages(async context =>
+            {
             var response = context.HttpContext.Response;
 
             switch (response.StatusCode)
             {
                 case 404:
                     response.ContentType = "text/plain";
-                    await response.WriteAsync("Hell Nah, you not authorized negro");
+                    await response.WriteAsync("You are not authorized");
                     break;
                 case 401:
                     response.ContentType = "text/plain";
                     await response.WriteAsync("NO NO NO!");
                     break;
             }
-        });
+             });
     }
 }
