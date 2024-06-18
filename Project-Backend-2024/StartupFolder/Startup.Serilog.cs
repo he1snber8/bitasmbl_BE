@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace Project_Backend_2024
+namespace Project_Backend_2024.StartupFolder
 {
     internal static partial class Startup
     {
