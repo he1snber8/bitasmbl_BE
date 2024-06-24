@@ -5,7 +5,7 @@ public interface IUnitOfWork
     IProjectRepository ProjectRepository { get; }
     IUserSkillsRepository UserSkillsRepository { get; }
     ISkillRepository SkillRepository { get; }
-    IAppliedProjectRepository AppliedProjectRepository { get; }
+    IProjectApplicationRepository ProjectApplicationRepository { get; }
 
     void BeginTransaction();
     void Commit();
