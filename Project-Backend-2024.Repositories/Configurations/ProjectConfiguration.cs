@@ -1,6 +1,9 @@
-﻿using Project_Backend_2024.DTO;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Project_Backend_2024.DTO;
+using Project_Backend_2024.DTO.Enums;
+
+namespace Project_Backend_2024.Repositories.Configurations;
 
 public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 {
@@ -12,9 +15,13 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasColumnType("varchar")
             .HasMaxLength(50)
             .IsRequired();
+        
+        builder.Property(ap => ap.PrincipalId)
+            .HasColumnType("nvarchar")
+            .HasMaxLength(450);
 
         builder.HasIndex(p => p.Name)
-           .IsUnique();
+            .IsUnique();
 
         builder.Property(p => p.Description)
             .HasColumnType("nvarchar")
@@ -22,9 +29,12 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .IsRequired();
 
         builder.Property(p => p.Status)
+            .HasConversion(
+                v => v.ToString(),
+                v => (ProjectStatus)Enum.Parse(typeof(ProjectStatus), v))
             .HasColumnType("varchar")
             .HasMaxLength(50)
-            .HasDefaultValueSql($"'Active'");
+            .HasDefaultValueSql("'Active'"); 
 
         builder.Property(p => p.IsDeleted)
             .HasDefaultValue(false);
@@ -35,7 +45,11 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.HasOne(p => p.User)
             .WithMany(user => user.Projects)
-            .HasForeignKey(p => p.PrincipalID)
+            .HasForeignKey(p => p.PrincipalId)
             .IsRequired();
+        
+        builder.HasMany(p => p.Applications)
+            .WithOne(pa => pa.Project)
+            .HasForeignKey(pa => pa.ProjectId);
     }
 }
