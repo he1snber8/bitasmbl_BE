@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Project_Backend_2024.DTO;
-using Project_Backend_2024.Facade;
 
 namespace Project_Backend_2024.Repositories.Configurations
 {
@@ -34,23 +33,22 @@ namespace Project_Backend_2024.Repositories.Configurations
             .HasColumnType("varchar")
             .IsRequired();
 
+            builder.Property(c => c.Picture)
+                .HasColumnType("varbinary(MAX)");
+
+            builder.Property(c => c.Bio)
+                .HasColumnType("varchar(255)");
+
             builder.Property(c => c.DateJoined)
-            .HasColumnType("datetime")
-            .HasDefaultValueSql("GETDATE()");
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("GETDATE()");
 
             builder.Property(c => c.LastLogin)
-            .HasColumnType("datetime");
-
-            builder.Property(m => m.Bio)
-            .HasColumnType("NVARCHAR")
-            .HasMaxLength(255);
+                .HasColumnType("datetime");
 
             builder.HasMany(p => p.Projects)
             .WithOne(u => u.User)
-            .HasForeignKey(u => u.PrincipalID);
-
-            builder.Property(m => m.Picture)
-           .HasColumnType("VARBINARY(MAX)");
+            .HasForeignKey(u => u.PrincipalId);
         }
     }
 }
