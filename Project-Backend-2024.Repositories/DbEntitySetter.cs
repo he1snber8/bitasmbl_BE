@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project_Backend_2024.DTO.Interfaces;
 
+namespace Project_Backend_2024.Repositories;
+
 public abstract class DbEntitySetter<TEntity, TDbContext>
     where TEntity : class, IEntity
     where TDbContext : DbContext

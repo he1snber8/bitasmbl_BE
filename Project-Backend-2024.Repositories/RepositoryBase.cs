@@ -50,6 +50,6 @@ namespace Project_Backend_2024.Repositories
         }
 
         public async Task<List<TEntity>> GetAll() => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
-
+    
     }
 }

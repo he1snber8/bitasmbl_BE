@@ -15,35 +15,33 @@ public abstract class BaseQueryService<TEntity, TEntityModel,TRepository> : IQue
     where TEntityModel : class, IEntityModel
 {
     protected readonly IMapper _mapper;
-    protected readonly IUnitOfWork _unitOfWork;
-    protected readonly TRepository _repository;
+    protected readonly TRepository ApplicationRepository;
 
-    public BaseQueryService(IUnitOfWork unitOfWork, IMapper mapper, TRepository repository)
+    public BaseQueryService(IMapper mapper, TRepository applicationRepository)
     {
-        _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _repository = repository;
+        ApplicationRepository = applicationRepository;
     }
 
     public virtual async Task<TEntityModel> GetByIdAsync(int id)
     {
-        var entity = await _repository.Set(u => u.Id == id).SingleOrDefaultAsync();
+        var entity = await ApplicationRepository.Set(u => u.Id == id).SingleOrDefaultAsync();
         return _mapper.Map<TEntityModel>(entity);
     }
 
     public virtual IQueryable<TEntityModel> Set(Expression<Func<TEntity, bool>> predicate)
     {
-        return _repository.Set(predicate).ProjectTo<TEntityModel>(_mapper.ConfigurationProvider);
+        return ApplicationRepository.Set(predicate).ProjectTo<TEntityModel>(_mapper.ConfigurationProvider);
     }
 
     public async Task<List<TEntityModel>> GetAll()
     {
-        var entities = await _repository.GetAll();
+        var entities = await ApplicationRepository.GetAll();
 
         var models = _mapper.Map<List<TEntityModel>>(entities);
 
         return models;
     }
 
-    public IQueryable<TEntityModel> Set() => _repository.Set().ProjectTo<TEntityModel>(_mapper.ConfigurationProvider);
+    public IQueryable<TEntityModel> Set() => ApplicationRepository.Set().ProjectTo<TEntityModel>(_mapper.ConfigurationProvider);
 }
