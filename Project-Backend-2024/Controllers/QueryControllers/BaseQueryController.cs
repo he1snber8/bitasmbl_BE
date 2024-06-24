@@ -1,44 +1,58 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Diagnostics;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.Models;
+using Project_Backend_2024.Services.Caching;
 using Project_Backend_2024.Services.Interfaces.Queries;
 
 namespace Project_Backend_2024.Controllers.QueryControllers;
 
 [ApiController]
 [Route("queries/[controller]")]
-public abstract class BaseQueryController<TEntity, TEntityModel, TQueryModel> : Controller
-    where TEntity : class, IEntity
+public abstract class BaseQueryController<TEntity, TEntityModel, TBasicModel, TQueryService>(
+    TQueryService queryService,
+    IMapper mapper,
+    CachingService cachingService,
+    CacheConfiguration cacheConfiguration,
+    IMemoryCache cache)
+    : Controller
     where TEntityModel : class, IEntityModel
-    where TQueryModel : IQueryModel<TEntity, TEntityModel>
+    where TEntity : class, IEntity
+    where TBasicModel : IBasicGetModel
+    where TQueryService : IQueryModel<TEntity, TEntityModel>
 {
-    protected TQueryModel _queryModel;
+    private readonly TQueryService _queryService = queryService;
 
-    public BaseQueryController(TQueryModel queryModel)
+   
+    protected async Task<List<TBasicModel>?> GetAll()
     {
-        _queryModel = queryModel;   
-    }
-
-    [Authorize]
-    [HttpGet("get")]
-    public virtual async Task<ActionResult<List<TEntityModel>>> GetAll()
-    {
-        try
+        if (cache.TryGetValue(cacheConfiguration.CacheKey, out List<TBasicModel>? cachedEntities))
         {
-            return Ok(await _queryModel.GetAll());
-        }
-        catch
-        {
-            return Unauthorized("You are an unauthorized");
+            Console.WriteLine("Cache Hit!.");
+            return cachedEntities;
         }
 
+        Console.WriteLine("Cache miss! fetching from DB.");
+        
+        var entities = await _queryService.GetAll();
+        var result = mapper.Map<List<TBasicModel>?>(entities);
+
+        var cacheEntryOptions = cachingService.BuildCacheOptions();
+        cache.Set(cacheConfiguration.CacheKey, result, cacheEntryOptions);
+
+        return result;
     }
 
-    [HttpGet("get/{id:int}")]
-    public virtual async Task<ActionResult<TEntityModel>> GetById([FromRoute] int id)
+
+    protected async Task<TBasicModel?> GetById(int id)
     {
-        return Ok(await _queryModel.GetByIdAsync(id));
-    }
+        var model = await _queryService.GetByIdAsync(id);
 
+        var result = mapper.Map<TBasicModel>(model);
+
+        return result;
+    }
 }

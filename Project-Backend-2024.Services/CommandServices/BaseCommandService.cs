@@ -1,10 +1,9 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Project_Backend_2024.Facade.Interfaces;
-using Project_Backend_2024.Services.Exceptions;
 using Project_Backend_2024.Services.Interfaces.Commands;
 using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.DTO.Interfaces;
+using Project_Backend_2024.Facade.Exceptions;
 
 namespace Project_Backend_2024.Services.CommandServices;
 
@@ -13,20 +12,19 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
     where TEntity : class, IEntity
     where TRepository : IRepositoryBase<TEntity>
 {
-    protected readonly IMapper _mapper;
-    protected readonly IUnitOfWork _unitOfWork;
-    protected readonly TRepository _repository;
-
-    public BaseCommandService(IUnitOfWork unitOfWork, IMapper mapper, TRepository repository)
+    private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
+    protected readonly TRepository ApplicationRepository;
+    public BaseCommandService(IUnitOfWork unitOfWork, IMapper mapper, TRepository applicationRepository)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _repository = repository;
+        ApplicationRepository = applicationRepository;
     }
 
     public virtual async Task<int> Delete(int id)
     {
-        var entity  = _repository.Set(u => u.Id == id).SingleOrDefault()
+        TEntity entity  = ApplicationRepository.Set(u => u.Id == id).SingleOrDefault()
            ?? throw new KeyNotFoundException();
 
         if (entity is IDeletable deletableEntity) { deletableEntity.IsDeleted = true; }
@@ -37,27 +35,26 @@ public abstract class BaseCommandService<TEntityModel, TEntity, TRepository> : I
 
     }
 
-    public virtual async Task<int> Insert(TEntityModel model)
+    public virtual async Task Insert(TEntityModel model)
     {
         if (model is null) throw new ArgumentNullException("Inserted entity must not be null!");
 
         TEntity entity = _mapper.Map<TEntity>(model);
 
-        _repository.Insert(entity);
-        await _unitOfWork.SaveChangesAsync();
+        ApplicationRepository.Insert(entity);
 
-        return entity.Id;
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public virtual async Task Update(int id, TEntityModel model)
     {
-        var entity = _repository.Set(u => u.Id == id).FirstOrDefault() ??
+        var entity = ApplicationRepository.Set(u => u.Id == id).FirstOrDefault() ??
             throw new KeyNotFoundException();;
   
         _mapper.Map(model, entity);
 
         if (entity is IDeletable deletableEntity && deletableEntity.IsDeleted)
-            throw new EntityNotFoundException<TEntity>(id);
+            throw new Exception();
 
         await _unitOfWork.SaveChangesAsync();
     }
