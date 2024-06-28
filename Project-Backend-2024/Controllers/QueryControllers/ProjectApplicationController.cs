@@ -1,49 +1,30 @@
-using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Project_Backend_2024.DTO;
-using Project_Backend_2024.Facade.BasicGetModels;
-using Project_Backend_2024.Facade.BasicInsertModels;
-using Project_Backend_2024.Facade.Models;
-using Project_Backend_2024.Services.Caching;
-using Project_Backend_2024.Services.Interfaces.Queries;
+using Project_Backend_2024.Facade.Exceptions;
+using Project_Backend_2024.Services.QueryServices.ProjectApplications.Get;
 
 namespace Project_Backend_2024.Controllers.QueryControllers;
 
-public class ProjectApplicationController : BaseQueryController
-    <ProjectApplication, ProjectApplicationModel, ProjectApplicationBasicGetModel, IProjectApplicationQueryService>
+[ApiController]
+[Route("queries/[controller]")]
+public class ProjectApplicationController(ISender sender) : Controller
 {
-    public ProjectApplicationController(IProjectApplicationQueryService queryService, IMapper mapper, 
-        CachingService cachingService, CacheConfiguration cacheConfiguration,
-        IMemoryCache cache) : base(queryService, mapper, cachingService, cacheConfiguration, cache) { }
-
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [HttpGet("get-my-applications")]
-    public async Task<IActionResult> GetAllApplications()
+    public async Task<IActionResult> GetAllApplications([FromQuery] string? name=null)
     {
         try
         {
-            var applicationModels = await GetAll();
+            var applicationModels = name is not null ?
+                await sender.Send(new GetMyProjectApplicationsQuery(name)) :
+                await sender.Send(new GetMyProjectApplicationsQuery());
 
-            if (applicationModels is null || applicationModels.Count == 0) return Ok("You have no applications yet");
-          
-            return Ok(applicationModels);
+            return applicationModels.Count == 0 ? Ok("You have no applications yet") : Ok(applicationModels);
         }
-        catch (Exception)
+        catch (ProjectNotFoundException ex)
         {
-            return BadRequest("Something went wrong");
-        }
-    }
-
-    [HttpGet("get-application/{id:int}")]
-    public async Task<IActionResult> GetApplicationById(int id)
-    {
-        try
-        {
-            var applicationModel = await GetById(id);
-
-            return applicationModel is null ? Ok("No application found with given Id") : Ok(applicationModel);
+            return BadRequest(ex.Message);
         }
         catch (Exception)
         {
