@@ -1,30 +1,32 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_Backend_2024.Facade.Exceptions;
 using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Authentication.AuthorizationServices;
 using System.Net;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
+using Project_Backend_2024.DTO;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
 [ApiController]
 [Route("commands/[controller]")]
-public class UserController(
-    ILogger<UserController> logger,
-    IUserAuthorizationService userAuthorizationService, IMemoryCache memoryCache)
-    : Controller
+public class UsersController(
+    ILogger<UsersController> logger,IUserAuthorizationService userAuthorizationService, 
+    IMemoryCache memoryCache,UserManager<User> userManager) : Controller
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserModel model)
+    public async Task<IActionResult> Register([FromQuery] string username ,[FromQuery] string email,[FromQuery] string password)
     {
         try
         {
-            await userAuthorizationService.Register(model);
+            var registerModel = new RegisterUserModel { Username = username, Email = email, Password = password };
+            
+            await userAuthorizationService.Register(registerModel);
+            
             logger.LogInformation("{Date}: User registered successfully.", DateTime.Now);
-            return Ok("User registered successfully!");
+            return Ok("User registered successfully, please check your email for confirmation");
         }
         catch (IdentityException ex)
         {
@@ -41,28 +43,31 @@ public class UserController(
             logger.LogError("{Date}: Password format error: {errorMessage}", DateTime.Now, ex.Message);
             return BadRequest(ex.ToString());
         }
+        
+        catch (EntityAlreadyExistsException ex)
+        {
+            logger.LogError("{Date}: {errorMessage}", DateTime.Now, ex.Message);
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LogIn([FromBody] UserLoginModel loginModel)
+    public async Task<IActionResult> LogIn([FromQuery] string username,[FromQuery] string password)
     {
         try
         {
-            await userAuthorizationService.AuthenticateLogin(loginModel);
+            var userLogin = new UserLoginModel { Username = username, Password = password };
+            
+            await userAuthorizationService.AuthenticateLogin(userLogin);
+            
             logger.LogInformation("{Date}: User authenticated successfully.", DateTime.Now);
-            memoryCache.Remove("SupaCache");
-            Console.WriteLine("cache removed!");
+
             return Ok("Authenticated successfully!");
         }
         catch (UserLoginException ex)
         {
             logger.LogWarning("{Date}: Login failed: {errorMessage}", DateTime.Now, ex.Message);
             return BadRequest("Login error, check the credentials.");
-        }
-        catch (TokenValidationException ex)
-        {
-            logger.LogWarning("{Date}: Token validation error: {errorMessage}", DateTime.Now, ex.Message);
-            return BadRequest("Token invalid, refresh it or something.");
         }
         catch (Exception ex)
         {
@@ -80,7 +85,7 @@ public class UserController(
             if (User.Identity is null || User.Identity.IsAuthenticated is false )
                 throw new UnauthorizedAccessException();
 
-            var cookie = HttpContext.Request.Cookies[".AspNetCore.MyAuthScheme"] 
+            var cookie = HttpContext.Request.Cookies[".AspNetCore.Cookies"] 
                          ?? throw new CookieException();
 
             await userAuthorizationService.RefreshToken(cookie);
@@ -111,8 +116,10 @@ public class UserController(
         try
         {
             await userAuthorizationService.SignOutAsync();
+            
             logger.LogInformation("{Date}: User logged out successfully.", DateTime.Now);
-            memoryCache.Remove("SupaCache");
+            memoryCache.Remove($"key-{User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value}");
+            
             Console.WriteLine("cache removed!");
             return Ok("Logged out!");
         }
@@ -122,5 +129,40 @@ public class UserController(
             return BadRequest("Error while logging out");
         }
     }
+    
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
+    [HttpPost("lock")]
+    public async Task<IActionResult> LockoutUser([FromQuery]string userId, DateTime lockoutEnd)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+
+        if (user == null) return BadRequest("Failed to lock out user.");
+        
+        var result = await userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+        
+        if (result.Succeeded)
+        {
+            return Ok("User locked out until " + lockoutEnd);
+        }
+        return BadRequest("Failed to lock out user.");
+    }
+    
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
+    [HttpPost("unlock")]
+    public async Task<IActionResult> UnlockUser([FromQuery]string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        
+        if (user == null) return BadRequest("Failed to unlock user.");
+        
+        var result = await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+        
+        if (result.Succeeded)
+        {
+            return Ok("User unlocked.");
+        }
+        return BadRequest("Failed to unlock user.");
+    }
+
 }
 
