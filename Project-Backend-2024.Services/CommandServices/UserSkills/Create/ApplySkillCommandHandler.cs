@@ -6,13 +6,12 @@ using Project_Backend_2024.Facade.Interfaces;
 
 namespace Project_Backend_2024.Services.CommandServices.UserSkills.Create;
 
-public class CreateUserSkillCommandHandler(IUserSkillsRepository userSkillsRepository, IUnitOfWork unitOfWork, 
-    ISkillRepository skillRepository, IHttpContextAccessor httpContextAccessor) 
-    : IRequestHandler<CreateUserSkillCommand,Unit>
+public class ApplySkillCommandHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) 
+    : IRequestHandler<ApplySkillCommand,Unit>
 {
-    public async Task<Unit> Handle(CreateUserSkillCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ApplySkillCommand request, CancellationToken cancellationToken)
     {
-        var skill = await skillRepository.Set(s => s.Name == request.Name).FirstOrDefaultAsync(cancellationToken)
+        var skill = await unitOfWork.SkillRepository.Set(s => s.Name == request.Name).FirstOrDefaultAsync(cancellationToken)
                     ?? throw new ArgumentException("Could not find skill");
         
         var httpUser = httpContextAccessor.HttpContext.User;
@@ -23,7 +22,7 @@ public class CreateUserSkillCommandHandler(IUserSkillsRepository userSkillsRepos
         var userId = httpUser.Claims.FirstOrDefault(c => c.Type == "Id")?.Value 
                      ?? throw new UserNotFoundException();
 
-        userSkillsRepository.Insert(new DTO.UserSkills()
+        unitOfWork.UserSkillsRepository.Insert(new DTO.UserSkills()
         {
             SkillId = skill.Id,
             UserId = userId
