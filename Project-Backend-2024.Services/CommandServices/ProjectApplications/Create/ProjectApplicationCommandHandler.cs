@@ -1,21 +1,22 @@
+using System.Security.Claims;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.DTO.Enums;
+using Project_Backend_2024.Facade.Exceptions;
 using Project_Backend_2024.Facade.Interfaces;
-using Project_Backend_2024.Services.Interfaces.Queries;
 
 
 namespace Project_Backend_2024.Services.CommandServices.ProjectApplications.Create;
 
-public class CreateProjectApplicationCommandHandler(
-    IUnitOfWork unitOfWork, IMapper mapper, IProjectApplicationRepository applicationRepository,
-    IHttpContextAccessor httpHttpContextAccessor, IProjectQueryService projectQueryService,
-    IUserQueryService userQueryService)
-    : IRequestHandler<CreateProjectApplicationCommand,Unit>
+public class ProjectApplicationCommandHandler(
+    IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpHttpContextAccessor, UserManager<User> userManager)
+    : IRequestHandler<ProjectApplicationCommand,Unit>
 {
-    public async Task<Unit> Handle(CreateProjectApplicationCommand request,  CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ProjectApplicationCommand request,  CancellationToken cancellationToken)
     {
         if (request.ProjectId <= 0) throw new ArgumentException("Invalid Project ID", nameof(request.ProjectId));
 
@@ -23,13 +24,16 @@ public class CreateProjectApplicationCommandHandler(
                          .FirstOrDefault(c => c.Type == "Id")?.Value ??
                      throw new ArgumentException("user null");
 
-        var project = await projectQueryService.Set(pr => pr.Id == request.ProjectId).FirstOrDefaultAsync(cancellationToken)
+        var project = await unitOfWork.ProjectRepository.Set(pr => pr.Id == request.ProjectId).FirstOrDefaultAsync(cancellationToken)
                       ?? throw new ArgumentException("Project does not exist");
+
+        if (project.Status is not ProjectStatus.Active)
+            throw new InvalidProjectStatusException(project.Status);
         
         if(userId == project.PrincipalId)
             throw new  ArgumentException("Cannot apply to own project");
 
-        var existingApplication = await applicationRepository.Set(pa => 
+        var existingApplication = await unitOfWork.ProjectApplicationRepository.Set(pa => 
             pa.ApplicantId == userId && pa.ProjectId == request.ProjectId).FirstOrDefaultAsync(cancellationToken);
         
         if (existingApplication != null)
@@ -37,23 +41,26 @@ public class CreateProjectApplicationCommandHandler(
             throw new InvalidOperationException("User has already applied for this project");
         }
 
-        var applicant = await userQueryService.GetByAsync(u => u.Id == userId)
+        var applicant = await userManager.FindByIdAsync(userId)
                         ?? throw new ArgumentException("Could not retrieve applicant");
 
-        var principal = await userQueryService.GetByAsync
-                            (p =>p.Id == project.PrincipalId)
-                        ?? throw new ArgumentException("Could not retrieve principal");
+        if (project.PrincipalId != null)
+        {
+            var principal = await userManager.FindByIdAsync(project.PrincipalId)
+                            ?? throw new ArgumentException("Could not retrieve principal");
 
-        if (string.IsNullOrEmpty(applicant.UserName) || string.IsNullOrEmpty(principal.UserName))
-            throw new ArgumentException("Username is empty");
+            if (string.IsNullOrEmpty(applicant.UserName) || string.IsNullOrEmpty(principal.UserName))
+                throw new ArgumentException("Username is empty");
+        }
 
         var application = mapper.Map<ProjectApplication>(request);
         
         application.ApplicantId = userId;
         application.PrincipalId = project.PrincipalId;
         application.Applicant = applicant.UserName;
+        application.ProjectName = project.Name;
 
-        applicationRepository.Insert(application);
+        unitOfWork.ProjectApplicationRepository.Insert(application);
 
         await unitOfWork.SaveChangesAsync();
 
