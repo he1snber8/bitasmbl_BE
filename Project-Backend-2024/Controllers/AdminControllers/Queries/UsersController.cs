@@ -2,15 +2,15 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_Backend_2024.Facade.Exceptions;
-using Project_Backend_2024.Facade.Models;
+using Project_Backend_2024.Facade.AdminModels;
 using Project_Backend_2024.Services.QueryServices.Users.Admin.Get;
 using Project_Backend_2024.Services.QueryServices.Users.Admin.List;
 
-namespace Project_Backend_2024.Controllers.AdminControllers.Queries.Users;
+namespace Project_Backend_2024.Controllers.AdminControllers.Queries;
 
 [ApiController]
-[Route("queries/admin/users")]
-public class UserQueryController(ISender sender) : Controller
+[Route("admin/[controller]")]
+public class UsersController(ISender sender) : Controller
 {
         
     [Authorize(AuthenticationSchemes = "Cookies",Policy = "AdminOnly")]
@@ -30,7 +30,7 @@ public class UserQueryController(ISender sender) : Controller
     }
     
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
-    [HttpGet]
+    [HttpGet("{email}")]
     public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
     {
         try

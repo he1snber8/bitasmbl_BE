@@ -1,8 +1,8 @@
 ﻿using Project_Backend_2024.DTO.Interfaces;
 
-namespace Project_Backend_2024.Facade.Models;
+namespace Project_Backend_2024.Facade.AdminModels;
 
-public class UserModel : IAuthenticatable, IMailApplicable
+public class UserModel
 {
     public string Id { get; set; } = null!;
     public string Username { get; set; } = null!;
@@ -11,4 +11,5 @@ public class UserModel : IAuthenticatable, IMailApplicable
     public byte[]? Picture { get; set; }
     public string? Bio { get; set; }
     public DateTime? LastLogin { get; set; }
+    public DateTime? DateJoined { get; set; }
 }

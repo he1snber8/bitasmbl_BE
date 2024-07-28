@@ -1,8 +1,8 @@
 ﻿using Project_Backend_2024.DTO.Interfaces;
 
-namespace Project_Backend_2024.Facade.Models;
+namespace Project_Backend_2024.Facade.InsertModels;
 
-public class RegisterUserModel : IAuthenticatable, IMailApplicable
+public record RegisterUserModel()
 {
     public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
