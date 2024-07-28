@@ -10,27 +10,29 @@ using Project_Backend_2024.Facade.Interfaces;
 
 namespace Project_Backend_2024.Services.CommandServices.Projects.Create;
 
-public class CreateProjectCommandHandler(IUnitOfWork unitOfWork, IMapper mapper,
-    IProjectRepository repository, IHttpContextAccessor httpContextAccessor,
-    IMemoryCache memoryCache, ILogger<CreateProjectCommandHandler> logger)
+public class CreateProjectCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, 
+    IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, ILogger<CreateProjectCommandHandler> logger)
     : IRequestHandler<CreateProjectCommand, Unit>
 {
     
     public async Task<Unit> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.Description))
-            throw new EmptyValueException();
+        if (string.IsNullOrEmpty(request.Name))
+            throw new EmptyValueException("Name");
+        
+        if (string.IsNullOrEmpty(request.Description))
+            throw new EmptyValueException("Description");
 
         var httpUser = httpContextAccessor.HttpContext.User;
 
         if (httpUser.Identity is null)
             throw new ArgumentNullException(nameof(httpUser), "Could not retrieve user");
 
-        var existingProject = await repository.Set(p => p.Name == request.Name)
+        var existingProject = await unitOfWork.ProjectRepository.Set(p => p.Name == request.Name)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (existingProject is not null)
-            throw new EntityAlreadyExistsException();
+            throw new EntityAlreadyExistsException(existingProject.Name);
 
         var model = mapper.Map<Project>(request);
 
@@ -39,7 +41,7 @@ public class CreateProjectCommandHandler(IUnitOfWork unitOfWork, IMapper mapper,
 
         model.PrincipalId = userId;
 
-        repository.Insert(model);
+        unitOfWork.ProjectRepository.Insert(model);
 
         await unitOfWork.SaveChangesAsync();
 
