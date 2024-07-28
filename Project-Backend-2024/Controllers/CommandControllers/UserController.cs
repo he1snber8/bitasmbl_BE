@@ -1,23 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_Backend_2024.Facade.Exceptions;
-using Project_Backend_2024.Facade.Models;
-using Project_Backend_2024.Services.Authentication.AuthorizationServices;
 using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.Facade.InsertModels;
+using Project_Backend_2024.Facade.Interfaces;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
 [ApiController]
-[Route("commands/[controller]")]
+[Route("[controller]")]
 public class UsersController(
     ILogger<UsersController> logger,IUserAuthorizationService userAuthorizationService, 
     IMemoryCache memoryCache,UserManager<User> userManager) : Controller
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromQuery] string username ,[FromQuery] string email,[FromQuery] string password)
+    public async Task<IActionResult> Register([FromQuery] string username,[FromQuery] string email,[FromQuery] string password)
     {
         try
         {
@@ -51,6 +51,7 @@ public class UsersController(
         }
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> LogIn([FromQuery] string username,[FromQuery] string password)
     {
@@ -69,6 +70,11 @@ public class UsersController(
             logger.LogWarning("{Date}: Login failed: {errorMessage}", DateTime.Now, ex.Message);
             return BadRequest("Login error, check the credentials.");
         }
+        catch (UserLockedException ex)
+        {
+            logger.LogWarning("{Date}: Login failed: {errorMessage}", DateTime.Now, ex.Message);
+            return StatusCode(423, ex.Message); 
+        }
         catch (Exception ex)
         {
             logger.LogError("{Date}: Unexpected error: {errorMessage}", DateTime.Now, ex.Message);
@@ -85,7 +91,7 @@ public class UsersController(
             if (User.Identity is null || User.Identity.IsAuthenticated is false )
                 throw new UnauthorizedAccessException();
 
-            var cookie = HttpContext.Request.Cookies[".AspNetCore.Cookies"] 
+            var cookie = HttpContext.Request.Cookies["BitasmblCookie"] 
                          ?? throw new CookieException();
 
             await userAuthorizationService.RefreshToken(cookie);
@@ -130,39 +136,5 @@ public class UsersController(
         }
     }
     
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
-    [HttpPost("lock")]
-    public async Task<IActionResult> LockoutUser([FromQuery]string userId, DateTime lockoutEnd)
-    {
-        var user = await userManager.FindByIdAsync(userId);
-
-        if (user == null) return BadRequest("Failed to lock out user.");
-        
-        var result = await userManager.SetLockoutEndDateAsync(user, lockoutEnd);
-        
-        if (result.Succeeded)
-        {
-            return Ok("User locked out until " + lockoutEnd);
-        }
-        return BadRequest("Failed to lock out user.");
-    }
-    
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
-    [HttpPost("unlock")]
-    public async Task<IActionResult> UnlockUser([FromQuery]string userId)
-    {
-        var user = await userManager.FindByIdAsync(userId);
-        
-        if (user == null) return BadRequest("Failed to unlock user.");
-        
-        var result = await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
-        
-        if (result.Succeeded)
-        {
-            return Ok("User unlocked.");
-        }
-        return BadRequest("Failed to unlock user.");
-    }
-
 }
 
