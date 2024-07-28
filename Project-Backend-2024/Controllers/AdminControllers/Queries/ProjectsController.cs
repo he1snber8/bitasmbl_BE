@@ -1,16 +1,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Project_Backend_2024.Facade.Models;
+using Project_Backend_2024.Facade.AdminModels;
 using Project_Backend_2024.Services.QueryServices.Projects.Admin.List;
 
-namespace Project_Backend_2024.Controllers.AdminControllers.Queries.Projects;
+namespace Project_Backend_2024.Controllers.AdminControllers.Queries;
 
 [ApiController]
-[Route("queries/admin/[controller]")]
+[Route("[controller]/admin")]
 public class ProjectsController(ISender sender) : Controller
 {
-    [Authorize(AuthenticationSchemes = "Cookies",Policy = "AdminOnly")]
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
     [HttpGet]
     public async Task<ActionResult<List<ProjectModel>>> ListAllProjects()
     {
