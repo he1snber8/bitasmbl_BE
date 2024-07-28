@@ -3,21 +3,26 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Project_Backend_2024.DTO;
-using Project_Backend_2024.Facade.BasicGetModels;
+using Project_Backend_2024.Facade.GetModels;
+using Project_Backend_2024.Services.Caching;
 
 namespace Project_Backend_2024.Services.QueryServices.ProjectApplications.Get;
 
-public class GetMyProjectApplicationsQueryHandler(IHttpContextAccessor httpContextAccessor,
-    UserManager<User> userManager, IMapper mapper) : IRequestHandler<GetMyProjectApplicationsQuery, List<ProjectApplicationBasicGetModel?>>
+public class GetMyProjectApplicationsQueryHandler
+(IHttpContextAccessor httpContextAccessor,IMapper mapper,IMemoryCache cache, CachingService cachingService,
+    UserManager<User> userManager) 
+    : QueryCachingService<List<ProjectApplication>,List<GetProjectApplicationModel?>>(cache,cachingService,mapper),
+        IRequestHandler<GetMyProjectApplicationsQuery, List<GetProjectApplicationModel?>?>
 {
-    public async Task<List<ProjectApplicationBasicGetModel?>> Handle(GetMyProjectApplicationsQuery request, CancellationToken cancellationToken)
+    public async Task<List<GetProjectApplicationModel?>?> Handle(GetMyProjectApplicationsQuery request, CancellationToken cancellationToken)
     {
         var userId = httpContextAccessor.HttpContext?.User?.Claims
             .FirstOrDefault(c => c.Type == "Id")?.Value;
 
         if (string.IsNullOrEmpty(userId))
-            return new List<ProjectApplicationBasicGetModel?>();
+            return new List<GetProjectApplicationModel?>();
 
         var projects =  userManager.Users
             .Where(u => u.Id == userId)
@@ -28,8 +33,9 @@ public class GetMyProjectApplicationsQueryHandler(IHttpContextAccessor httpConte
 
         var projectApplications = await projects
             .SelectMany(p => p.Applications.Where(a => a.PrincipalId == userId)).ToListAsync(cancellationToken);
-            
+           
+        var projectApplicationModels = InitializeQueryCaching($"key-{projectApplications.Count.ToString()}", projectApplications);
 
-        return mapper.Map<List<ProjectApplicationBasicGetModel?>>(projectApplications);
+        return projectApplicationModels;
     }
 }

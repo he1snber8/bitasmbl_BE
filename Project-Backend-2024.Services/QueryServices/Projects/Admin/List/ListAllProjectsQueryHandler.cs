@@ -1,11 +1,10 @@
 using AutoMapper;
 using MediatR;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.Facade.AdminModels;
 using Project_Backend_2024.Facade.Interfaces;
-using Project_Backend_2024.Facade.Models;
 using Project_Backend_2024.Services.Caching;
 
 namespace Project_Backend_2024.Services.QueryServices.Projects.Admin.List;
