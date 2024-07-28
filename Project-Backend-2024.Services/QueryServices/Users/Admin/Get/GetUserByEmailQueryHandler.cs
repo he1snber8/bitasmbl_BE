@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Project_Backend_2024.DTO;
 using Project_Backend_2024.Facade.Exceptions;
-using Project_Backend_2024.Facade.Models;
+using Project_Backend_2024.Facade.AdminModels;
 using Project_Backend_2024.Services.Caching;
 
 namespace Project_Backend_2024.Services.QueryServices.Users.Admin.Get;
