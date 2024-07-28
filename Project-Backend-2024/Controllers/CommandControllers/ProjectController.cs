@@ -1,99 +1,138 @@
-using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Project_Backend_2024.Facade.BasicInsertModels;
 using Project_Backend_2024.Facade.Exceptions;
-using Project_Backend_2024.Facade.Models;
-using Project_Backend_2024.Services.Interfaces.Commands;
+using Project_Backend_2024.Services.CommandServices.ProjectApplications.Create;
+using Project_Backend_2024.Services.CommandServices.ProjectApplications.Update;
+using Project_Backend_2024.Services.CommandServices.Projects.Create;
+using Project_Backend_2024.Services.CommandServices.Projects.Delete;
+using Project_Backend_2024.Services.CommandServices.Projects.Update;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
-public class ProjectController(
-    IProjectCommandService commandService,
-    IMapper mapper,
-    ILogger<ProjectController> logger,
-    IMemoryCache memoryCache)
-    : BaseCommandController<ProjectModel, ProjectBasicAlterModel, IProjectCommandService>(commandService, mapper,
-        memoryCache)
+[ApiController]
+[Route("[controller]")]
+public class ProjectController(ISender sender) : Controller
 {
-
-    [HttpPost("create-project")]
-    public override async Task<IActionResult> Insert(ProjectBasicAlterModel basicAlterModel)
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    [HttpPost]
+    public async Task<IActionResult> CreateCommand([FromQuery] string name, [FromQuery] string description)
     {
-        if (User.Identity is null)
-            throw new UnauthorizedAccessException();
-        
         try
         {
-            var model = Mapper.Map<ProjectModel>(basicAlterModel);
-            
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value
-                         ?? throw new UserNotFoundException();
+            await sender.Send(new CreateProjectCommand(name, description));
 
-            model.PrincipalId = userId;
-                
-            await ApplicationCommandService.Insert(model);
-            
-            MemoryCache.Remove("SupaCache");
-            Console.WriteLine("cache removed!");
-
-            logger.LogInformation("[{Date}] User with an ID {userId} created project successfully.",
-                DateTime.Now, userId);
-            
             return Ok("Project created successfully!");
         }
-        catch (ArgumentNullException ex)
+        catch (ArgumentNullException ex) {return BadRequest(ex.Message);}
+
+        catch (EmptyValueException ex) { return BadRequest(ex.Message);}
+
+        catch (UserNotFoundException ex) {return BadRequest(ex.Message);}
+
+        catch (EntityAlreadyExistsException ex) {return BadRequest(ex.Message);}
+
+        catch (Exception)
         {
-            logger.LogError(ex, "User ID not found in claims.");
-            return BadRequest("Could not retrieve user.");
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            logger.LogError(ex, "Unauthorized acess");
-            return BadRequest("Could not retrieve user.");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while creating the project.");
             return StatusCode(500, "An error occurred while creating the project.");
         }
     }
     
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    [HttpPut("update/{name}")]
-    public override async Task<IActionResult> Update(string name, ProjectBasicAlterModel updateModel)
+    [HttpPut]
+    public async Task<IActionResult> UpdateCommand(int id, string? name, string? description, string? status)
     {
         try
         {
-            if (User.Identity is null)
-                throw new UnauthorizedAccessException();
+            await sender.Send(new UpdateProjectCommand(id,name,description,status));
 
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value
-                         ?? throw new UserNotFoundException();
-
-            var project = Mapper.Map<ProjectModel>(updateModel);
-
-            await ApplicationCommandService.Update(name, project, userId);
-
-            return Ok("Project updated successfully");
+            return Ok("Project updated successfully!");
         }
-        catch (UnauthorizedAccessException)
+        catch (ArgumentNullException ex) { return BadRequest(ex.Message); } 
+        
+        catch (EmptyValueException ex) { return BadRequest(ex.Message); }
+
+        catch (UserNotFoundException ex) { return BadRequest(ex.Message); }
+        
+        catch (ProjectNotFoundException ex) { return BadRequest(ex.Message); }
+        
+        catch (Exception)
         {
-            return Unauthorized("You are not authorized to do that");
+            return StatusCode(500, "An error occurred while updating the project.");
+        }
+    }
+    
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteCommand(DeleteProjectCommand deleteProjectCommand)
+    {
+        try
+        {
+            await sender.Send(deleteProjectCommand);
+
+            return Ok("Project deleted!");
+        }
+        catch (ProjectNotFoundException ex) {return BadRequest(ex.Message);}
+
+        catch (UnauthorizedAccessException ex) { return BadRequest(ex.Message);}
+
+        catch (UserNotFoundException ex) {return BadRequest(ex.Message);}
+
+        catch (EntityAlreadyExistsException ex) {return BadRequest(ex.Message);}
+
+        catch (Exception)
+        {
+            return StatusCode(500, "An error occurred while deleting the project.");
+        }
+    }
+    
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    [HttpPost("apply")]
+    public  async Task<IActionResult> CreateCommand(ProjectApplicationCommand projectApplicationCommand)
+    {
+        try
+        {
+            await sender.Send(projectApplicationCommand);
+
+            return Ok("Applied to project successfully!");
         }
         catch (UserNotFoundException)
         {
-            return BadRequest("could not retrieve user");
+            return BadRequest("User not found");
         }
-        catch (Exception)
+        catch (InvalidProjectStatusException ex)
         {
-            return BadRequest("error");
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"something went wrong: {ex.Data}");
         }
     }
-
-    public override Task<IActionResult> Delete(int id)
+    
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    [HttpPut("applications/update")]
+    public  async Task<IActionResult> UpdateCommand(UpdateProjectApplicationCommand projectApplicationCommand)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await sender.Send(projectApplicationCommand);
+
+            return Ok("Updated project successfully!");
+        }
+        catch (UserNotFoundException)
+        {
+            return BadRequest("User not found");
+        }
+        catch (InvalidProjectStatusException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"something went wrong: {ex.Data}");
+        }
     }
 }
+
+
