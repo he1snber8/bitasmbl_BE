@@ -8,12 +8,10 @@ public class UserSkillsConfiguration : IEntityTypeConfiguration<UserSkills>
 {
     public void Configure(EntityTypeBuilder<UserSkills> builder)
     {
-        builder.HasNoKey();
-
-        builder.HasIndex(us => new { UserID = us.UserId, SkillID = us.SkillId }).IsUnique();
+        builder.HasKey(us => new { us.UserId, us.SkillId });
 
         builder.HasOne(ap => ap.User)
-            .WithMany()
+            .WithMany(w => w.UserSkills)
             .OnDelete(DeleteBehavior.NoAction)
             .HasForeignKey(ap => ap.UserId)
             .IsRequired();
@@ -23,7 +21,7 @@ public class UserSkillsConfiguration : IEntityTypeConfiguration<UserSkills>
             .HasMaxLength(450);
         
         builder.HasOne(ap => ap.Skill)
-            .WithMany()
+            .WithMany(s => s.UserSkills)
             .HasForeignKey(ap => ap.SkillId)
             .IsRequired();
 

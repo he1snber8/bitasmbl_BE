@@ -25,8 +25,12 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.Property(p => p.Description)
             .HasColumnType("nvarchar")
-            .HasMaxLength(255)
+            .HasMaxLength(1024)
             .IsRequired();
+
+        builder.Property(p => p.Applications)
+            .HasColumnType("tinyint")
+            .HasDefaultValue(0);
 
         builder.Property(p => p.Status)
             .HasConversion(
@@ -48,8 +52,23 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasForeignKey(p => p.PrincipalId)
             .IsRequired();
         
-        builder.HasMany(p => p.Applications)
+        builder.HasMany(p => p.ProjectApplications)
             .WithOne(pa => pa.Project)
-            .HasForeignKey(pa => pa.ProjectId);
+            .HasForeignKey(pa => pa.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(p => p.ProjectCategories)
+            .WithOne(p => p.Project)
+            .HasForeignKey(pa => pa.CategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(p => p.ProjectRequirements)
+            .WithOne(r => r.Project)
+            .HasForeignKey(pa => pa.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.Property(p => p.GithubRepo)
+            .HasColumnType("varchar")
+            .HasMaxLength(256);
     }
 }
