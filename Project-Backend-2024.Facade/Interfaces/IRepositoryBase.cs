@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 namespace Project_Backend_2024.Facade.Interfaces;
 
 public interface IRepositoryBase<TEntity>
-    where TEntity : IEntity
+    where TEntity : IBaseEntity
 {
     void Insert(TEntity entity);
     void Delete(TEntity entity);
