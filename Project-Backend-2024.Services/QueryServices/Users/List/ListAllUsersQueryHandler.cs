@@ -16,7 +16,7 @@ public class ListAllUsersQueryHandler(IUserRepository userRepository,IMemoryCach
     {
         var users = await userRepository.GetAll();
 
-        var userModels = InitializeQueryCaching($"key-users", users);
+        var userModels = InitializeQueryCaching(users.Count.ToString(), users);
 
         return userModels;
     }

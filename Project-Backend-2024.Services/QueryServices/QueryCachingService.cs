@@ -15,22 +15,22 @@ public class QueryCachingService<TSource,TDestination>
         _cachingService = cachingService;
         _mapper = mapper;
     }
-    protected List<TDestination?>? InitializeQueryCaching(string key, List<TSource> source)
+    protected TDestination?  InitializeQueryCaching(string key, TSource? source)
     {
-        if (_cache.TryGetValue(key, out List<TDestination?>? appliedProjects))
+        if (_cache.TryGetValue(key, out TDestination? destination))
         {
             Console.WriteLine("cache hit!");
-            return appliedProjects;
+            return destination;
         }
         
         Console.WriteLine("cache miss, fetching from db...");
 
-        var models = _mapper.Map<List<TDestination?>?>(source);
+        var result = _mapper.Map<TDestination>(source);
         
         var cacheEntry = _cachingService.BuildCacheOptions();
         
-        _cache.Set(key, models, cacheEntry);
+        _cache.Set(key, result, cacheEntry);
 
-        return models;
+        return result;
     }
 }
