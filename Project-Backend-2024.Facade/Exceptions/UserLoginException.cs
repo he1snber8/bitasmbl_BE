@@ -2,23 +2,23 @@ namespace Project_Backend_2024.Facade.Exceptions;
 
 public class UserLoginException : Exception
 {
-    public string? Username { get; }
+    public string? UserIdentificator { get; }
     public bool IsPasswordIncorrect { get; }
     public UserLoginException() : base("You have entered an invalid username or password") {}
 
-    public UserLoginException(string? username) 
-        : base($"Invalid login attempt for username '{username}'")
+    public UserLoginException(string? userIdentificator) 
+        : base($"user with '{userIdentificator}' is not yet registered")
     {
-        Username = username;
+        UserIdentificator = userIdentificator;
         IsPasswordIncorrect = false;
     }
 
-    public UserLoginException(string? username, bool isPasswordIncorrect) 
+    public UserLoginException(string? userIdentificator, bool isPasswordIncorrect) 
         : base(isPasswordIncorrect 
-            ? $"Incorrect password for username '{username}'" 
-            : $"Invalid login attempt for username '{username}'")
+            ? $"Incorrect password for '{userIdentificator}'" 
+            : $"Invalid login attempt")
     {
-        Username = username;
+        UserIdentificator = userIdentificator;
         IsPasswordIncorrect = isPasswordIncorrect;
     }
 
