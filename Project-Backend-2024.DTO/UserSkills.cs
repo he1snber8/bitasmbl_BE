@@ -2,13 +2,14 @@
 
 namespace Project_Backend_2024.DTO;
 
-public class UserSkills : IEntity
+public class UserSkills : IBaseEntity
 {
-    public int Id { get; }
-
-    public User? User { get; set; }
-    public string UserId { get; set; }
-
-    public Skill? Skill { get; set; }
+    // Foreign Keys
+    public required string UserId { get; set; }
     public int SkillId { get; set; }
+
+    // Navigation Properties
+    public User? User { get; set; } 
+    public Skill? Skill { get; set; } 
 }
+
