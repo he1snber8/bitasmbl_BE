@@ -1,7 +1,3 @@
-Here’s a cleaned-up and properly styled version of your backend `README.md`:
-
----
-
 # 🧠 Bitasmbl Backend
 
 Welcome to the **backend of Bitasmbl** — a collaboration platform designed to connect skilled developers and creators, enabling them to form teams, build real-world projects, and validate ideas through hands-on experience.
@@ -79,7 +75,3 @@ Interested in contributing or collaborating?
 
 - 📧 Email: [lukakhaja@yahoo.com](mailto:lukakhaja@yahoo.com)  
 - 🌐 Platform: [bitasmbl.com](https://bitasmbl.com)
-
----
-
-Let me know if you'd like a badge header, license block, or contributor section added!
