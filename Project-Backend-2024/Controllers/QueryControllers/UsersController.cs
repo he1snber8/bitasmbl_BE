@@ -2,11 +2,9 @@
 using System.Runtime.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Project_Backend_2024.Controllers.CommandControllers;
 using Project_Backend_2024.DTO.Github;
 using Project_Backend_2024.Facade.FetchModels;
 using Project_Backend_2024.Facade.GetModels;
