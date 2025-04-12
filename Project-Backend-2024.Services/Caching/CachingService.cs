@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
-using Project_Backend_2024.Facade.Models;
+using Project_Backend_2024.Services.Configurations;
 
 namespace Project_Backend_2024.Services.Caching;
 
