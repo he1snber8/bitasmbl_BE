@@ -43,10 +43,10 @@ Unlike traditional job boards or freelance platforms, Bitasmbl emphasizes **coll
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/your-username/bitasmbl-backend.git
+git clone https://github.com/he1snber8/bitasmbl_BE.git
 
 # 2. Navigate into the project
-cd bitasmbl-backend
+cd bitasmbl-BE
 
 # 3. Setup your database and secrets (appsettings.json)
 
