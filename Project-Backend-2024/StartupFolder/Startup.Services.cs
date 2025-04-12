@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Project_Backend_2024.Facade.Models;
-using Project_Backend_2024.Services.Authentication.AuthorizationServices;
-using Project_Backend_2024.Services.CommandServices;
-using Project_Backend_2024.Services.Interfaces.Commands;
-using Project_Backend_2024.Services.Interfaces.Queries;
-using Project_Backend_2024.Services.QueryServices;
-using Project_Backend_2024.Services.Authentication.TokenGenerators;
+﻿using Amazon;
+using Amazon.S3;
+using Microsoft.Extensions.Options;
+using Project_Backend_2024.Facade.Interfaces;
+using Project_Backend_2024.Services.Authentication.CookieGenerators;
 using Project_Backend_2024.Services.Caching;
-using Project_Backend_2024.Services.TokenValidators;
+using Project_Backend_2024.Services.CommandServices;
+using Project_Backend_2024.Services.CommandServices.AWS;
+using Project_Backend_2024.Services.CommandServices.Users;
+using Project_Backend_2024.Services.Configurations;
+
 
 namespace Project_Backend_2024.StartupFolder;
 
@@ -15,21 +16,15 @@ internal static partial class Startup
 {
     internal static void ConfigureServices(this IServiceCollection services)
     {
-        services.AddScoped<IProjectCommandService, ProjectCommandService>()
-                .AddScoped<IAppliedProjectCommandService, ProjectApplicationCommandService>()
-                .AddScoped<ISkillCommandService, SkillCommandService>()
-                .AddScoped<IUserSkillsCommandService, UserSkillsCommandService>()
-                .AddScoped<IAuthorizableService, AuthorizableService>();
+        services.AddScoped<IUserAuthentication, UserAuthorizationService>()
+            .AddScoped<IUserRegistration, UserRegistrationCommand>()
+            .AddScoped<IUserSignOut, UserSignOutCommand>()
+            .AddScoped<ProjectsHub>();
+        
+        
 
-        services.AddScoped<IUserQueryService, UserQueryService>()
-                .AddScoped<IProjectQueryService, ProjectQueryService>();
-
-
-        services.AddScoped<AccessTokenGenerator>()
-            .AddScoped<RefreshTokenGenerator>()
-            .AddScoped<TokenValidator>()
-            .AddScoped<CachingService>();
-
-        // services.AddScoped<RoleInitializer>();
+        services.AddScoped<CachingService>()
+            .AddScoped<CookieGenerator>()
+            .AddScoped<S3BucketService>();
     }
 }

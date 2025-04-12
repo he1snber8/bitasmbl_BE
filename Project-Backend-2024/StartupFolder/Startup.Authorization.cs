@@ -4,7 +4,7 @@ namespace Project_Backend_2024.StartupFolder;
 
 internal static partial class Startup
 {
-    internal static void ConfigureAuthorization(this IServiceCollection services)
+    private static void ConfigureAuthorization(this IServiceCollection services)
     {
         services.AddAuthorization(options =>
         {
