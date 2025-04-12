@@ -46,6 +46,29 @@ and passionate creators to turn ideas into tangible products.
 
     🔎 Skill & role matching logic (WIP)
 
+🧪 How to Run Locally
+
+# 1. Clone the repo
+git clone https://github.com/your-username/bitasmbl-backend.git
+
+# 2. Setup database and secrets (appsettings.json)
+
+# 3. Run migrations
+dotnet ef database update
+
+# 4. Start the backend
+dotnet run
+
+🔒 Environment & Secrets
+
+Be sure to configure:
+
+    AWS credentials
+
+    GitHub/Google OAuth Client IDs
+
+    Connection strings for MSSQL
+
 📬 Contact & Collaboration
 
 Interested in contributing?
