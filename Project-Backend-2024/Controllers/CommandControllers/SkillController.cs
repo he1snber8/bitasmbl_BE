@@ -1,10 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Project_Backend_2024.Services.CommandServices.Skills;
-using Project_Backend_2024.Services.CommandServices.Skills.Create;
-using Project_Backend_2024.Services.CommandServices.UserSkills.Create;
-using Project_Backend_2024.Services.CommandServices.UserSkills.Delete;
+using Project_Backend_2024.Facade;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
@@ -14,11 +11,11 @@ public class SkillController(ISender sender) : Controller
 {
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [HttpPost("apply")]
-    public async Task<IActionResult> CreateSkill([FromQuery] string name)
+    public async Task<IActionResult> CreateSkill([FromBody] ApplySkillModel applySkillModel)
     {
         try
         {
-            await sender.Send(new ApplySkillCommand(name));    
+            await sender.Send(applySkillModel);    
 
             return Ok("Skill applied!");
         }
@@ -34,11 +31,11 @@ public class SkillController(ISender sender) : Controller
     
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [HttpDelete("profile")]
-    public async Task<IActionResult> RemoveSkill([FromQuery] string name)
+    public async Task<IActionResult> RemoveSkill([FromBody] ApplySkillModel applySkillModel)
     {
         try
         {
-            await sender.Send(new RemoveSkillCommand(name));
+            await sender.Send(applySkillModel);
 
             return Ok("Skill removed!");
         }
