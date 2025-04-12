@@ -2,31 +2,39 @@
 using Microsoft.Extensions.Logging;
 using Project_Backend_2024.Facade.Interfaces;
 
-public class UnitOfWork : IUnitOfWork, IDisposable
+namespace Project_Backend_2024.Repositories;
+
+public class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> logger) : IUnitOfWork, IDisposable
 {
     private IDbContextTransaction? _transaction;
-    private readonly DatabaseContext _context;
-    private readonly ILogger<UnitOfWork> _logger;
+    private readonly DatabaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
+    private readonly ILogger<UnitOfWork> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-    private readonly Lazy<IProjectRepository> _projectRepository;
-    private readonly Lazy<IUserSkillsRepository> _userSkillsRepository;
-    private readonly Lazy<ISkillRepository> _skillRepository;
-    private readonly Lazy<IAppliedProjectRepository> _appliedProjectRepository;
+    private readonly Lazy<IUserRepository> _userRepository = new(() => new UserRepository(context));
+    private readonly Lazy<IProjectRepository> _projectRepository = new(() => new ProjectRepository(context));
 
-    public UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> logger)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _projectRepository = new Lazy<IProjectRepository>(() => new ProjectRepository(context));
-        _userSkillsRepository = new Lazy<IUserSkillsRepository>(() => new UserSkillsRepository(context));
-        _skillRepository = new Lazy<ISkillRepository>(() => new SkillRepository(context));
-        _appliedProjectRepository = new Lazy<IAppliedProjectRepository>(() => new AppliedProjectRepository(context));
-    }
+    private readonly Lazy<IUserSkillsRepository> _userSkillsRepository = new(() => new UserSkillsRepository(context));
+    private readonly Lazy<ISkillRepository> _skillRepository = new(() => new SkillRepository(context));
+    
+    private readonly Lazy<ITransactionRepository> _transactionRepository = new(() => new TransactionRepository(context));
 
+    private readonly Lazy<ICategoryRepository> _categoryRepository =
+        new(() => new CategoryRepository(context));
+
+    private readonly Lazy<IRequirementRepository> _requirementRepository =
+        new(() => new RequirementRepository(context));
+    
+    private readonly Lazy<IProjectImagesRepostiory> _projectImagesRepository =
+        new(() => new ProjectImagesRepository(context));
+    
+    public IUserRepository UserRepository => _userRepository.Value;
     public IProjectRepository ProjectRepository => _projectRepository.Value;
+    public IRequirementRepository RequirementRepository => _requirementRepository.Value;
+    public ICategoryRepository CategoryRepository => _categoryRepository.Value;
     public IUserSkillsRepository UserSkillsRepository => _userSkillsRepository.Value;
     public ISkillRepository SkillRepository => _skillRepository.Value;
-    public IAppliedProjectRepository AppliedProjectRepository => _appliedProjectRepository.Value;
+    public IProjectImagesRepostiory ProjectImagesRepository => _projectImagesRepository.Value;
+    public ITransactionRepository TransactionRepository => _transactionRepository.Value;
 
     public void BeginTransaction()
     {
