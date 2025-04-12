@@ -1,9 +1,9 @@
-🧠 Bitasmbl Backend
+# 🧠 Bitasmbl Backend
 
-Welcome to the backend of Bitasmbl — a collaboration platform built to connect skilled developers and creators, enabling them to form teams, 
+# Welcome to the backend of Bitasmbl — a collaboration platform built to connect skilled developers and creators, enabling them to form teams, 
 build real-world projects, and validate product ideas through hands-on experience.
 
-🚀 What is Bitasmbl?
+# 🚀 What is Bitasmbl?
 
 Bitasmbl is a platform that helps:
 
@@ -16,7 +16,7 @@ Bitasmbl is a platform that helps:
 Unlike traditional job boards or freelance sites, Bitasmbl focuses on collaboration over competition — fostering a space for juniors, mid-levels, 
 and passionate creators to turn ideas into tangible products.
 
-🏗️ Backend Stack
+# 🏗️ Backend Stack
 
     .NET Core 8 — Web API
 
@@ -32,7 +32,7 @@ and passionate creators to turn ideas into tangible products.
 
     MSSQL — Primary database
 
-✨ Core Features
+# ✨ Core Features
 
     🔐 User authentication with GitHub/Google
 
@@ -46,17 +46,17 @@ and passionate creators to turn ideas into tangible products.
 
     🔎 Skill & role matching logic (WIP)
 
-🧪 How to Run Locally
+# 🧪 How to Run Locally
 
-# 1. Clone the repo
+ 1. Clone the repo
 git clone https://github.com/your-username/bitasmbl-backend.git
 
-# 2. Setup database and secrets (appsettings.json)
+ 2. Setup database and secrets (appsettings.json)
 
-# 3. Run migrations
+ 3. Run migrations
 dotnet ef database update
 
-# 4. Start the backend
+ 4. Start the backend
 dotnet run
 
 🔒 Environment & Secrets
