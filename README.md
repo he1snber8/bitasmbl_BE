@@ -1,78 +1,85 @@
+Here’s a cleaned-up and properly styled version of your backend `README.md`:
+
+---
+
 # 🧠 Bitasmbl Backend
 
-# Welcome to the backend of Bitasmbl — a collaboration platform built to connect skilled developers and creators, enabling them to form teams, 
-build real-world projects,and validate product ideas through hands-on experience.
+Welcome to the **backend of Bitasmbl** — a collaboration platform designed to connect skilled developers and creators, enabling them to form teams, build real-world projects, and validate ideas through hands-on experience.
 
-# 🚀 What is Bitasmbl?
+---
 
-Bitasmbl is a platform that helps:
+## 🚀 What is Bitasmbl?
 
-    Aspiring developers gain real-world project experience
+Bitasmbl helps:
 
-    Innovators find collaborators with the right skillsets
+- 🌱 Aspiring developers gain real-world project experience  
+- 💡 Innovators find collaborators with the right skillsets  
+- 🧩 Teams build MVPs and validate product-market fit  
 
-    Teams build MVPs together and prove the value of their ideas
+Unlike traditional job boards or freelance platforms, Bitasmbl emphasizes **collaboration over competition**, making it the perfect place for juniors, mid-levels, and creators to build together.
 
-Unlike traditional job boards or freelance sites, Bitasmbl focuses on collaboration over competition — fostering a space for juniors, mid-levels, 
-and passionate creators to turn ideas into tangible products.
+---
 
-# 🏗️ Backend Stack
+## 🏗️ Backend Stack
 
-    .NET Core 8 — Web API
+- **.NET Core 8** — Web API  
+- **Entity Framework Core** — ORM for MSSQL  
+- **SignalR** — Real-time communication (project notifications)  
+- **Amazon S3** — File storage for project assets and user avatars  
+- **Cookie Authentication** — Session-based auth  
+- **Google & GitHub OAuth** — Secure third-party login  
+- **MSSQL** — Primary relational database  
 
-    Entity Framework Core — ORM for MSSQL
+---
 
-    SignalR — Real-time communication (e.g., project notifications)
+## ✨ Core Features
 
-    Amazon S3 — File storage (project assets, avatars)
+- 🔐 User authentication with GitHub & Google  
+- 🧠 Project creation with category & tech requirements  
+- 📩 Application + approval system for project collaboration  
+- 🔔 SignalR-powered real-time notifications  
+- ☁️ AWS S3 integration for file uploads  
+- 🔍 Skill-based matching logic (in progress)
 
-    Cookie Auth — Auth flow for external and internal users
+---
 
-    Google & GitHub OAuth — Third-party authentication
+## 🧪 How to Run Locally
 
-    MSSQL — Primary database
-
-# ✨ Core Features
-
-    🔐 User authentication with GitHub/Google
-
-    🧑‍💻 Project creation with categories and tech requirements
-
-    📨 Application & approval system between devs and project owners
-
-    💬 SignalR-powered real-time notification system
-
-    📦 AWS S3 integration for media uploads
-
-    🔎 Skill & role matching logic (WIP)
-
-# 🧪 How to Run Locally
-
- 1. Clone the repo
+```bash
+# 1. Clone the repo
 git clone https://github.com/your-username/bitasmbl-backend.git
 
- 2. Setup database and secrets (appsettings.json)
+# 2. Navigate into the project
+cd bitasmbl-backend
 
- 3. Run migrations
+# 3. Setup your database and secrets (appsettings.json)
+
+# 4. Apply database migrations
 dotnet ef database update
 
- 4. Start the backend
+# 5. Start the backend server
 dotnet run
+```
 
-🔒 Environment & Secrets
+---
 
-Be sure to configure:
+## 🔒 Environment & Secrets
 
-    AWS credentials
+Ensure the following are set in your environment:
 
-    GitHub/Google OAuth Client IDs
+- AWS Access Key & Secret  
+- GitHub/Google OAuth credentials  
+- MSSQL connection string  
 
-    Connection strings for MSSQL
+---
 
-📬 Contact & Collaboration
+## 📬 Contact & Collaboration
 
-Interested in contributing?
-Want to join the project or ask questions?
+Interested in contributing or collaborating?
 
-Email: lukakhaja@yahoo.com
-Platform: bitasmbl.com
+- 📧 Email: [lukakhaja@yahoo.com](mailto:lukakhaja@yahoo.com)  
+- 🌐 Platform: [bitasmbl.com](https://bitasmbl.com)
+
+---
+
+Let me know if you'd like a badge header, license block, or contributor section added!
