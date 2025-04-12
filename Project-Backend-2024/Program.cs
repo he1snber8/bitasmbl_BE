@@ -18,29 +18,17 @@ builder.Services.AddSingleton<IAmazonS3>(sp => new AmazonS3Client(
     builder.Configuration["S3Settings:SecretKey"],
     Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["S3Settings:Region"])));
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 builder.Services.AddSignalR();
 
 Console.WriteLine("App has started!!!");
 
-var allowedOrigin1 = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN_1") ?? "";
-var allowedOrigin2 = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN_2") ?? "";
-
 var app = builder.Build();
-app.UseCors(policy => policy.WithOrigins(allowedOrigin1, allowedOrigin2)
-    .AllowAnyMethod().AllowCredentials().AllowAnyHeader());
 
-app.UseCors();
+app.UseCors("CorsPolicy");
 app.UseWebSockets(); 
 app.AddMiddleWare();
 app.MapHub<ProjectsHub>("/projects-hub");
+app.UseSwagger();
+app.UseSwaggerUI();
 app.Run();
