@@ -19,9 +19,6 @@ mono_crash.*
 # Ignore local settings files
 Properties/*
 
-#ignore appsettings
-appsettings.json
-
 data-mmsql/
 
 # IDE and editor junk
@@ -31,9 +28,6 @@ data-mmsql/
 
 # macOS
 .DS_Store
-
-# Ignore launch settings
-launchSettings.json
 
 # Build results
 [Dd]ebug/
