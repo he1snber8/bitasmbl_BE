@@ -1,138 +1,238 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Project_Backend_2024.Facade;
+using Project_Backend_2024.Facade.AlterModels;
 using Project_Backend_2024.Facade.Exceptions;
-using Project_Backend_2024.Services.CommandServices.ProjectApplications.Create;
-using Project_Backend_2024.Services.CommandServices.ProjectApplications.Update;
-using Project_Backend_2024.Services.CommandServices.Projects.Create;
-using Project_Backend_2024.Services.CommandServices.Projects.Delete;
-using Project_Backend_2024.Services.CommandServices.Projects.Update;
 
 namespace Project_Backend_2024.Controllers.CommandControllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ProjectController(ISender sender) : Controller
+public class ProjectsController(
+    ISender sender,
+    ILogger<ProjectsController> logger,
+    IHubContext<ProjectsHub> projectsHub) : Controller
 {
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [HttpPost]
-    public async Task<IActionResult> CreateCommand([FromQuery] string name, [FromQuery] string description)
+    public async Task<IActionResult> CreateCommand([FromBody] CreateProjectModel projectCommand)
     {
         try
         {
-            await sender.Send(new CreateProjectCommand(name, description));
 
-            return Ok("Project created successfully!");
+            var projectId = await sender.Send(projectCommand);
+
+            logger.LogInformation("{Date}: Project created successfully.", DateTime.Now);
+            return Ok(new { message = "Project created successfully!", projectId });
         }
-        catch (ArgumentNullException ex) {return BadRequest(ex.Message);}
-
-        catch (EmptyValueException ex) { return BadRequest(ex.Message);}
-
-        catch (UserNotFoundException ex) {return BadRequest(ex.Message);}
-
-        catch (EntityAlreadyExistsException ex) {return BadRequest(ex.Message);}
-
-        catch (Exception)
+        catch (ArgumentNullException ex)
         {
-            return StatusCode(500, "An error occurred while creating the project.");
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InsufficientFundsException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (EmptyValueException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ProjectCategoryNotSelectedException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ProjectRequirementNotSelectedException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ProjectMediaNotIncludedException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (UserNotFoundException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (EntityAlreadyExistsException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("{Date}: Unexpected error: {Message}", DateTime.Now, ex.Message);
+            return BadRequest(new { message = $"An error occurred while creating the project: {ex}" });
         }
     }
-    
+
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [HttpPut]
-    public async Task<IActionResult> UpdateCommand(int id, string? name, string? description, string? status)
+    public async Task<IActionResult> UpdateCommand(UpdateProjectModel updateProjectModel)
     {
         try
         {
-            await sender.Send(new UpdateProjectCommand(id,name,description,status));
+            var updatedProjectModel = await sender.Send(updateProjectModel);
 
-            return Ok("Project updated successfully!");
+            return Ok(updatedProjectModel);
         }
-        catch (ArgumentNullException ex) { return BadRequest(ex.Message); } 
-        
-        catch (EmptyValueException ex) { return BadRequest(ex.Message); }
-
-        catch (UserNotFoundException ex) { return BadRequest(ex.Message); }
-        
-        catch (ProjectNotFoundException ex) { return BadRequest(ex.Message); }
-        
-        catch (Exception)
+        catch (ArgumentNullException ex)
         {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (EmptyValueException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (UserNotFoundException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ProjectNotFoundException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("{Date}: Unexpected error: {Message}", DateTime.Now, ex.Message);
             return StatusCode(500, "An error occurred while updating the project.");
         }
     }
-    
+
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    [HttpDelete]
-    public async Task<IActionResult> DeleteCommand(DeleteProjectCommand deleteProjectCommand)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteCommand(int id)
     {
         try
         {
-            await sender.Send(deleteProjectCommand);
+            await sender.Send(new DeleteProjectModel(id));
 
+            logger.LogInformation("{Date}: Project deleted successfully.", DateTime.Now);
             return Ok("Project deleted!");
         }
-        catch (ProjectNotFoundException ex) {return BadRequest(ex.Message);}
-
-        catch (UnauthorizedAccessException ex) { return BadRequest(ex.Message);}
-
-        catch (UserNotFoundException ex) {return BadRequest(ex.Message);}
-
-        catch (EntityAlreadyExistsException ex) {return BadRequest(ex.Message);}
-
-        catch (Exception)
+        catch (ProjectNotFoundException ex)
         {
+            return BadRequest(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            logger.LogWarning("{Date}: UnauthorizedAccessException: {Message}", DateTime.Now, ex.Message);
+            return BadRequest(ex.Message);
+        }
+        catch (UserNotFoundException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (EntityAlreadyExistsException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("{Date}: Unexpected error: {Message}", DateTime.Now, ex.Message);
             return StatusCode(500, "An error occurred while deleting the project.");
         }
     }
-    
+
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [HttpPost("apply")]
-    public  async Task<IActionResult> CreateCommand(ProjectApplicationCommand projectApplicationCommand)
+    public async Task<IActionResult> ApplyProjectCommand([FromBody] ApplyToProjectModel applyToProjectModel)
     {
         try
         {
-            await sender.Send(projectApplicationCommand);
+            var appliedProject = await sender.Send(applyToProjectModel);
+            // await projectsHub.Clients.All.SendAsync("ProjectApplied", appliedProject);
+            await projectsHub.Clients.Group($"principal_{appliedProject.PrincipalId}")
+                .SendAsync("ProjectApplied", appliedProject);
 
-            return Ok("Applied to project successfully!");
+            
+            Console.WriteLine($"User applied and message sent to a group: principal_{appliedProject.PrincipalId}");
+
+            return Ok(appliedProject);
         }
-        catch (UserNotFoundException)
+        catch (UserNotFoundException ex)
         {
-            return BadRequest("User not found");
+            return BadRequest(new { message = "User not found" });
         }
         catch (InvalidProjectStatusException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (AlreadyAppliedException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ProjectMaxApplicationLimitException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
-            return BadRequest($"something went wrong: {ex.Data}");
+            logger.LogError("{Date}: Unexpected error: {Message}", DateTime.Now, ex.Message);
+            return StatusCode(500, new { message = ex.Message });
         }
     }
-    
+
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    [HttpPut("applications/update")]
-    public  async Task<IActionResult> UpdateCommand(UpdateProjectApplicationCommand projectApplicationCommand)
+    [HttpPost("images/upload")]
+    public async Task<IActionResult> UploadProjectImage([FromForm] UploadProjectImagesModel? uploadImagesModel)
     {
+        if (uploadImagesModel is null) return Ok("No files were uploaded");
         try
         {
-            await sender.Send(projectApplicationCommand);
+            await sender.Send(uploadImagesModel);
 
-            return Ok("Updated project successfully!");
+            logger.LogInformation("{Date}: Project updated successfully.", DateTime.Now);
+            return Ok(new { message = "Image uploaded successfully!" });
         }
-        catch (UserNotFoundException)
+        catch (ProjectNotFoundException ex)
         {
-            return BadRequest("User not found");
+            return BadRequest(new { message = ex.Message });
         }
-        catch (InvalidProjectStatusException ex)
+        catch (ProjectMediaNotIncludedException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
-            return BadRequest($"something went wrong: {ex.Data}");
+            logger.LogWarning("{Date}: Unexpected Error: {Message}", DateTime.Now, ex.Message);
+            return BadRequest(new { message = "Something went wrong" });
+        }
+    }
+
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    [HttpPut("applications/approve/{id:int}")]
+    public async Task<IActionResult> ApproveApplication(int id)
+    {
+        try
+        {
+            var applicationModel = await sender.Send(new UpdateApplicationModel(id, "Approved"));
+
+            return Ok(applicationModel);
+        }
+        catch
+        {
+            return BadRequest("Could not approve application");
+        }
+    }
+
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    [HttpPut("applications/reject/{id:int}")]
+    public async Task<IActionResult> RejectApplication(int id)
+    {
+        try
+        {
+            var applicationModel = await sender.Send(new UpdateApplicationModel(id, "Rejected"));
+
+            return Ok(applicationModel);
+        }
+        catch
+        {
+            return BadRequest("Could not reject application");
         }
     }
 }
-
-
