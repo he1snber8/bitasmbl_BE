@@ -1,7 +1,7 @@
 # 🧠 Bitasmbl Backend
 
 # Welcome to the backend of Bitasmbl — a collaboration platform built to connect skilled developers and creators, enabling them to form teams, 
-build real-world projects, and validate product ideas through hands-on experience.
+build real-world projects,and validate product ideas through hands-on experience.
 
 # 🚀 What is Bitasmbl?
 
