@@ -18,7 +18,8 @@ internal static partial class Startup
         {
             config.RegisterServicesFromAssemblies(typeof(AddSkillCommand).Assembly);
         });
-        
+        services.ConfigureCors();
+
         services.AddAutoMapper(typeof(Mappers).Assembly);
         
     }
