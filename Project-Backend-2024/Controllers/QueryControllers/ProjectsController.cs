@@ -44,13 +44,13 @@ public class ProjectsController(ISender sender, ILogger<ProjectsController> logg
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> ListAllProjects()
+    public async Task<IActionResult> ListAllProjects([FromQuery] int page = 1, [FromQuery] int pageSize = 8)
     {
         try
         {
             logger.LogInformation("Fetching all available projects.");
 
-            var projects = await sender.Send(new ListAllProjectsQuery());
+            var projects = await sender.Send(new ListAllProjectsQuery(page,pageSize));
 
             if (projects?.Count == 0)
             {

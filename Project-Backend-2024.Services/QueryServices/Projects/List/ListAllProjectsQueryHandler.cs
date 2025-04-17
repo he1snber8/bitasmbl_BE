@@ -30,13 +30,18 @@ public class ListAllProjectsQueryHandler(
             .FirstOrDefault(c => c.Type == "Id")?.Value;
 
         IQueryable<Project> query = projectRepository.Set().Include(p => p.ProjectImages)
+            // .Where(p => p.PrincipalId != userId)
             .Include(p => p.User)
-            .ThenInclude(u => u.UserSocials); // Include Requirement names via junction table
+            .ThenInclude(u => u.UserSocials)
+            .OrderByDescending(p => p.DateCreated);
 
         if (userId is not null)
             query = query.Where(p => p.User.Id != userId);
 
-        var projects = await query.ToListAsync(cancellationToken);
+        var projects = await query
+            .Skip((request.page - 1) * request.pageSize)
+            .Take(request.pageSize)
+            .ToListAsync(cancellationToken);
 
         var projectModels = InitializeQueryCaching(projects.Count.ToString(), projects);
 

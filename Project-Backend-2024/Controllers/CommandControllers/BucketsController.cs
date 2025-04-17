@@ -11,7 +11,7 @@ namespace Project_Backend_2024.Controllers.CommandControllers;
 [ApiController]
 public class BucketsController(IAmazonS3 s3Client, S3BucketService s3BucketService) : ControllerBase
 {
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
+    // [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOnly")]
     [HttpGet("get-all")]
     public async Task<IActionResult> GetAllBucketAsync()
     {

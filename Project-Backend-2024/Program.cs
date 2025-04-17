@@ -1,6 +1,7 @@
 using Amazon.S3;
 using Project_Backend_2024;
 using Project_Backend_2024.Facade.Interfaces;
+using Project_Backend_2024.Services.Configurations;
 using Project_Backend_2024.Services.Mailing;
 using Project_Backend_2024.StartupFolder;
 
@@ -10,6 +11,7 @@ builder.ConfigureSerilog();
 builder.Services.ConfigureApp(builder.Configuration);
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<GithubSettings>(builder.Configuration.GetSection("GithubSettings"));
+builder.Services.Configure<S3ClientConfiguration>(builder.Configuration.GetSection("S3Settings"));
 builder.Services.AddSingleton<IEmailService, SendGridEmailService>();
 builder.Logging.AddConsole();
 
@@ -36,7 +38,7 @@ var allowedOrigin1 = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN_1") ?? "
 var allowedOrigin2 = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN_2") ?? "";
 
 var app = builder.Build();
-app.UseCors(policy => policy.WithOrigins(allowedOrigin1, allowedOrigin2)
+app.UseCors(policy => policy.WithOrigins(allowedOrigin1, allowedOrigin2, "http://localhost:3000")
     .AllowAnyMethod().AllowCredentials().AllowAnyHeader());
 
 app.UseCors();
