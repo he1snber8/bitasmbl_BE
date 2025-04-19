@@ -38,14 +38,14 @@ public class UsersController(
     {
         try
         {
-            await userRegistration.Register(registerUserModel);
+            var user = await userRegistration.Register(registerUserModel);
 
-            var userModel = mapper.Map<UserModel>(registerUserModel);
+            var userModel = mapper.Map<UserModel>(user);
 
             logger.LogInformation("{Date}: User registered successfully.", DateTime.Now);
             return Ok(new
             {
-                message = userModel.RegistrationType != RegistrationType.Standard.ToString()
+                message = userModel.RegistrationType != RegistrationType.StandardTeamManager.ToString()
                     ? $"User registered successfully with {userModel.RegistrationType}"
                     : "User registered successfully, please check your email for confirmation",
                 userModel
@@ -177,41 +177,74 @@ public class UsersController(
         }
     }
 
-    [HttpGet("auth/github")]
-    [AllowAnonymous]
-    public async Task<IActionResult> LoginGithubUser([FromQuery] string code)
+    [HttpPost("team/init")]
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    public async Task<IActionResult> InitializeTeam([FromForm] InitializeTeamCommand initializeTeam)
     {
-        using var httpClient = new HttpClient();
-
-        var accessToken = await sender.Send(new GetGithubAccessToken(code));
-
-        if (string.IsNullOrEmpty(accessToken))
-            return BadRequest("Access token missing in response.");
-
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        request.Headers.UserAgent.ParseAdd("Bitasmbl"); // GitHub API requires a User-Agent
-
-        var userResponse = await httpClient.SendAsync(request);
-
-        var userResponseBody = await userResponse.Content.ReadAsStringAsync();
-
-        var githubUser = JsonConvert.DeserializeObject<GithubUser>(userResponseBody)
-                         ?? throw new SerializationException();
-
-        var existingUser = await userManager.FindByNameAsync(githubUser.Login);
-
-        _ = existingUser is null
-            ? await Register(new RegisterUserModel(Username: githubUser.Login, Email: githubUser.Email,
-                ImageUrl: githubUser.Avatar_Url, Password: "",
-                RegistrationType: githubUser.Provider))
-            : await LogIn(new UserLoginModel(Email: "", githubUser.Login, Password: "",
-                LoginType: githubUser.Provider));
-
-        // var repos = await sender.Send(new GetGithubRepos(accessToken, githubUser.Repos_Url));
-
-        return Ok(new { accessToken });
+        try
+        {
+           await sender.Send(initializeTeam);
+           return Ok(new { message = "User updated successfully!" });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return BadRequest(new { message = "Something went wrong" });
+        }
     }
+    
+    [HttpPost("team/members/add")]
+    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    public async Task<IActionResult> InsertTeamMembers([FromBody] PopulateTeamWithMembersCommand populateTeamWithMembers)
+    {
+        try
+        {
+            await sender.Send(populateTeamWithMembers);
+            return Ok(new { message = "Team members added successfully!" });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return BadRequest(new { message = "Something went wrong" });
+        }
+    }
+
+
+    // [HttpGet("auth/github")]
+    // [AllowAnonymous]
+    // public async Task<IActionResult> LoginGithubUser([FromQuery] string code)
+    // {
+    //     using var httpClient = new HttpClient();
+    //
+    //     var accessToken = await sender.Send(new GetGithubAccessToken(code));
+    //
+    //     if (string.IsNullOrEmpty(accessToken))
+    //         return BadRequest("Access token missing in response.");
+    //
+    //     var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
+    //     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    //     request.Headers.UserAgent.ParseAdd("Bitasmbl"); // GitHub API requires a User-Agent
+    //
+    //     var userResponse = await httpClient.SendAsync(request);
+    //
+    //     var userResponseBody = await userResponse.Content.ReadAsStringAsync();
+    //
+    //     var githubUser = JsonConvert.DeserializeObject<GithubUser>(userResponseBody)
+    //                      ?? throw new SerializationException();
+    //
+    //     var existingUser = await userManager.FindByNameAsync(githubUser.Login);
+    //
+    //     _ = existingUser is null
+    //         ? await Register(new RegisterUserModel(Username: githubUser.Login, Email: githubUser.Email,
+    //             ImageUrl: githubUser.Avatar_Url, Password: "",
+    //             RegistrationType: githubUser.Provider))
+    //         : await LogIn(new UserLoginModel(Email: "", githubUser.Login, Password: "",
+    //             LoginType: githubUser.Provider));
+    //
+    //     // var repos = await sender.Send(new GetGithubRepos(accessToken, githubUser.Repos_Url));
+    //
+    //     return Ok(new { accessToken });
+    // }
 
     [HttpGet("auth/google")]
     [AllowAnonymous]
@@ -238,30 +271,30 @@ public class UsersController(
             await s3BucketService.UploadImageFromUrlToS3Async(googleUser.Picture, $"profile-images/{googleUser.Email}");
 
         return existingUser is null
-            ? await Register(new RegisterUserModel(Username: googleUser.Name, Email: googleUser.Email,
+            ? await Register(new RegisterUserModel(FirstName: googleUser.Name, LastName: googleUser.Family_Name ,Email: googleUser.Email,
                 ImageUrl: imageUrl, Password: "",
                 RegistrationType: googleUser.Provider))
-            : await LogIn(new UserLoginModel(Email: googleUser.Email, Username: googleUser.Name, Password: "",
+            : await LogIn(new UserLoginModel(Email: googleUser.Email, Password: "",
                 LoginType: googleUser.Provider));
     }
 
 
-    [HttpPost("balance/fill")]
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    public async Task<IActionResult> FillUpUserBalance([FromBody] CreateTransactionCommand createTransactionCommand)
-    {
-        try
-        {
-            await sender.Send(createTransactionCommand);
-            return Ok("Transaction successful!");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{Date}: Payment error: {errorMessage}", DateTime.Now, ex.Message);
-            return BadRequest(new { message = "Error during payment" });
-        }
-
-    }
+    // [HttpPost("balance/fill")]
+    // [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    // public async Task<IActionResult> FillUpUserBalance([FromBody] CreateTransactionCommand createTransactionCommand)
+    // {
+    //     try
+    //     {
+    //         await sender.Send(createTransactionCommand);
+    //         return Ok("Transaction successful!");
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         logger.LogError("{Date}: Payment error: {errorMessage}", DateTime.Now, ex.Message);
+    //         return BadRequest(new { message = "Error during payment" });
+    //     }
+    //
+    // }
     
     [AllowAnonymous]
     [HttpPost("password-recovery-request")]

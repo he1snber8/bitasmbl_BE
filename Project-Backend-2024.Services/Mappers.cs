@@ -13,14 +13,46 @@ public class Mappers : Profile
     public Mappers()
     {
         // User mappings
-        CreateMap<User, UserModel>()
-            .ReverseMap()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-        CreateMap<RegisterUserModel, UserModel>();
-        CreateMap<RegisterUserModel, User>();
-        CreateMap<GetUserProfileModel, User>().ReverseMap();
-        CreateMap<User, GetUserModel>()
-            .ReverseMap();
+        // CreateMap<User, UserModel>()
+        //     .ReverseMap()
+        //     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        // CreateMap<RegisterUserModel, UserModel>();
+        // CreateMap<TeamMember, User>();
+        CreateMap<UserModel, RegisterUserModel>().ReverseMap();
+        CreateMap<UserModel, TeamManager>().ReverseMap();
+        CreateMap<UserModel, OrganizationManager>().ReverseMap();
+        CreateMap<TeamManager, GetTeamManagerProfileModel>()
+            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+            .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio))
+            .ForMember(dest => dest.Email,opt => opt.MapFrom(src => src.Email)); // or map if available
+
+        // CreateMap<Source, DestinationBase>()
+        //     .ForMember(d => d.Id, op => op.MapFrom(s => s.Id)) // you can remove this
+        //     .Include<Source, DestinationDerived1>()
+        //     .Include<Source, DestinationDerived2>();
+        // Base User -> RegisterUserModel
+        CreateMap<User, RegisterUserModel>()
+            .Include<TeamManager, RegisterUserModel>()
+            .Include<OrganizationManager, RegisterUserModel>();
+        
+        CreateMap<User, GetUserProfileModel>()
+            .Include<TeamManager, GetTeamManagerProfileModel>();
+
+
+// Derived classes
+        CreateMap<TeamManager, RegisterUserModel>();
+        CreateMap<OrganizationManager, RegisterUserModel>();
+
+// Reverse mapping
+        CreateMap<RegisterUserModel, User>()
+            .Include<RegisterUserModel, TeamManager>()
+            .Include<RegisterUserModel, OrganizationManager>();
+
+        CreateMap<RegisterUserModel, TeamManager>().IncludeBase<RegisterUserModel, User>();
+        CreateMap<RegisterUserModel, OrganizationManager>().IncludeBase<RegisterUserModel, User>();
+        // CreateMap<User, GetUserModel>()
+        //     .ReverseMap();
         // .ForMember(dest => dest, opt => opt.MapFrom(src => src.Email))
         // .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
@@ -56,10 +88,10 @@ public class Mappers : Profile
         //     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         // UserSkills mappings
-        CreateMap<UserSkills, UserSkillsModel>()
-            .ReverseMap();
+        // CreateMap<UserSkills, UserSkillsModel>()
+        //     .ReverseMap();
 
-        CreateMap<Skill, GetSkillsModel>().ReverseMap();
+        // CreateMap<Skill, GetSkillsModel>().ReverseMap();
 
         CreateMap<UserSocialLink, UserSocialLinkModel>().ReverseMap();
 
@@ -69,7 +101,7 @@ public class Mappers : Profile
             .ReverseMap();
 
         CreateMap<RequirementModel, Requirement>().ReverseMap();
-        CreateMap<RequirementTest, GetRequirementTestModel>().ReverseMap();
+        // CreateMap<RequirementTest, GetRequirementTestModel>().ReverseMap();
 
         CreateMap<ProjectImageModel, ProjectImage>().ReverseMap();
         CreateMap<ProjectLink, ProjectLinkModel>().ReverseMap();
@@ -78,6 +110,7 @@ public class Mappers : Profile
         CreateMap<Transaction, GetTransactionModel>().ReverseMap();
         CreateMap<Transaction, CreateTransactionCommand>().ReverseMap();
 
+        CreateMap<Team, InitializeTeamCommand>().ReverseMap();
         //
     }
 }

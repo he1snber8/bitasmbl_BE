@@ -86,109 +86,109 @@ public class UsersController(UserManager<User> userManager, ISender sender, ILog
         }
     }
     
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    [HttpGet("github/repos")]
-    public async Task<IActionResult> GetGithubUserRepos([FromQuery] string accessToken, [FromQuery] string username)
-    {
-        using var httpClient = new HttpClient();
+    // [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    // [HttpGet("github/repos")]
+    // public async Task<IActionResult> GetGithubUserRepos([FromQuery] string accessToken, [FromQuery] string username)
+    // {
+    //     using var httpClient = new HttpClient();
+    //
+    //     // var accessToken = await sender.Send(new GetGithubAccessToken(code));
+    //
+    //     if (string.IsNullOrEmpty(accessToken))
+    //         return BadRequest("Access token missing in response.");
+    //
+    //     var reposUrl = $"https://api.github.com/users/{username}/repos";
+    //
+    //     var request = new HttpRequestMessage(HttpMethod.Get, reposUrl);
+    //     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    //     request.Headers.UserAgent.ParseAdd("Bitasmbl");
+    //
+    //     var repoResponse = await httpClient.SendAsync(request);
+    //
+    //     var repoResponseBody = await repoResponse.Content.ReadAsStringAsync();
+    //
+    //     var deserializedRepos = JsonConvert.DeserializeObject<List<GithubRepo>>(repoResponseBody)
+    //                             ?? throw new SerializationException();
+    //
+    //     return Ok(deserializedRepos);
+    // }
 
-        // var accessToken = await sender.Send(new GetGithubAccessToken(code));
 
-        if (string.IsNullOrEmpty(accessToken))
-            return BadRequest("Access token missing in response.");
-
-        var reposUrl = $"https://api.github.com/users/{username}/repos";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, reposUrl);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        request.Headers.UserAgent.ParseAdd("Bitasmbl");
-
-        var repoResponse = await httpClient.SendAsync(request);
-
-        var repoResponseBody = await repoResponse.Content.ReadAsStringAsync();
-
-        var deserializedRepos = JsonConvert.DeserializeObject<List<GithubRepo>>(repoResponseBody)
-                                ?? throw new SerializationException();
-
-        return Ok(deserializedRepos);
-    }
-
-
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    [HttpGet("github/repo/commits")]
-    public async Task<IActionResult> GetGithubUserRepoCommits([FromQuery] string accessToken,
-        [FromQuery] string username, [FromQuery] string repo, [FromQuery] string branch = "main")
-    {
-        using var httpClient = new HttpClient();
-
-        // var accessToken = await sender.Send(new GetGithubAccessToken(code));
-
-        if (string.IsNullOrEmpty(accessToken))
-            return BadRequest("Access token missing in response.");
-
-        var commitsUrl = $"https://api.github.com/repos/{username}/{repo}/commits?sha={branch}";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, commitsUrl);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        request.Headers.UserAgent.ParseAdd("Bitasmbl");
-
-        var commitsResponse = await httpClient.SendAsync(request);
-
-        var repoResponseBody = await commitsResponse.Content.ReadAsStringAsync();
-
-        if (string.IsNullOrWhiteSpace(repoResponseBody))
-            return Ok(new { message = "empty commits" });
-
-        if (repoResponseBody.TrimStart().StartsWith("{")) // If response is a JSON object
-        {
-            var deserializedCommit = JsonConvert.DeserializeObject<GithubCommit>(repoResponseBody)
-                                      ?? throw new SerializationException();
-            
-            return Ok(deserializedCommit);
-        }
-        var deserializedCommits = JsonConvert.DeserializeObject<List<GithubCommit>>(repoResponseBody)
-                                  ?? throw new SerializationException();
-
-        return Ok(deserializedCommits);
-    }
+    // [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    // [HttpGet("github/repo/commits")]
+    // public async Task<IActionResult> GetGithubUserRepoCommits([FromQuery] string accessToken,
+    //     [FromQuery] string username, [FromQuery] string repo, [FromQuery] string branch = "main")
+    // {
+    //     using var httpClient = new HttpClient();
+    //
+    //     // var accessToken = await sender.Send(new GetGithubAccessToken(code));
+    //
+    //     if (string.IsNullOrEmpty(accessToken))
+    //         return BadRequest("Access token missing in response.");
+    //
+    //     var commitsUrl = $"https://api.github.com/repos/{username}/{repo}/commits?sha={branch}";
+    //
+    //     var request = new HttpRequestMessage(HttpMethod.Get, commitsUrl);
+    //     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    //     request.Headers.UserAgent.ParseAdd("Bitasmbl");
+    //
+    //     var commitsResponse = await httpClient.SendAsync(request);
+    //
+    //     var repoResponseBody = await commitsResponse.Content.ReadAsStringAsync();
+    //
+    //     if (string.IsNullOrWhiteSpace(repoResponseBody))
+    //         return Ok(new { message = "empty commits" });
+    //
+    //     if (repoResponseBody.TrimStart().StartsWith("{")) // If response is a JSON object
+    //     {
+    //         var deserializedCommit = JsonConvert.DeserializeObject<GithubCommit>(repoResponseBody)
+    //                                   ?? throw new SerializationException();
+    //         
+    //         return Ok(deserializedCommit);
+    //     }
+    //     var deserializedCommits = JsonConvert.DeserializeObject<List<GithubCommit>>(repoResponseBody)
+    //                               ?? throw new SerializationException();
+    //
+    //     return Ok(deserializedCommits);
+    // }
     
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    [HttpGet("github/repo/branches")]
-    public async Task<IActionResult> GetGithubUserRepoBranches([FromQuery] string accessToken,
-        [FromQuery] string username, [FromQuery] string repo)
-    {
-        using var httpClient = new HttpClient();
-
-        // var accessToken = await sender.Send(new GetGithubAccessToken(code));
-
-        if (string.IsNullOrEmpty(accessToken))
-            return BadRequest("Access token missing in response.");
-
-        var commitsUrl = $"https://api.github.com/repos/{username}/{repo}/branches";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, commitsUrl);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        request.Headers.UserAgent.ParseAdd("Bitasmbl");
-
-        var commitsResponse = await httpClient.SendAsync(request);
-
-        var repoResponseBody = await commitsResponse.Content.ReadAsStringAsync();
-
-        if (string.IsNullOrWhiteSpace(repoResponseBody))
-            return Ok(new { message = "empty commits" });
-
-        if (repoResponseBody.TrimStart().StartsWith("{")) // If response is a JSON object
-        {
-            var deserializedCommit = JsonConvert.DeserializeObject<GithubCommit>(repoResponseBody)
-                                     ?? throw new SerializationException();
-            
-            return Ok(deserializedCommit);
-        }
-        var deserializedCommits = JsonConvert.DeserializeObject<List<GithubCommit>>(repoResponseBody)
-                                  ?? throw new SerializationException();
-
-        return Ok(deserializedCommits);
-    }
+    // [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    // [HttpGet("github/repo/branches")]
+    // public async Task<IActionResult> GetGithubUserRepoBranches([FromQuery] string accessToken,
+    //     [FromQuery] string username, [FromQuery] string repo)
+    // {
+    //     using var httpClient = new HttpClient();
+    //
+    //     // var accessToken = await sender.Send(new GetGithubAccessToken(code));
+    //
+    //     if (string.IsNullOrEmpty(accessToken))
+    //         return BadRequest("Access token missing in response.");
+    //
+    //     var commitsUrl = $"https://api.github.com/repos/{username}/{repo}/branches";
+    //
+    //     var request = new HttpRequestMessage(HttpMethod.Get, commitsUrl);
+    //     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    //     request.Headers.UserAgent.ParseAdd("Bitasmbl");
+    //
+    //     var commitsResponse = await httpClient.SendAsync(request);
+    //
+    //     var repoResponseBody = await commitsResponse.Content.ReadAsStringAsync();
+    //
+    //     if (string.IsNullOrWhiteSpace(repoResponseBody))
+    //         return Ok(new { message = "empty commits" });
+    //
+    //     if (repoResponseBody.TrimStart().StartsWith("{")) // If response is a JSON object
+    //     {
+    //         var deserializedCommit = JsonConvert.DeserializeObject<GithubCommit>(repoResponseBody)
+    //                                  ?? throw new SerializationException();
+    //         
+    //         return Ok(deserializedCommit);
+    //     }
+    //     var deserializedCommits = JsonConvert.DeserializeObject<List<GithubCommit>>(repoResponseBody)
+    //                               ?? throw new SerializationException();
+    //
+    //     return Ok(deserializedCommits);
+    // }
 
     [HttpGet("confirm")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string? userId, [FromQuery] string? token)

@@ -10,13 +10,13 @@ using Project_Backend_2024.Facade.Interfaces;
 
 namespace Project_Backend_2024.Services.QueryServices.Users.Get;
 
-public class GetUserByIdQueryHandler(UserManager<User> userManager, IUserRepository userRepository, IMapper mapper)
+public class GetUserByIdQueryHandler(UserManager<User> userManager, ITeamManagerRepository userRepository, IMapper mapper)
     : IRequestHandler<GetUserByIdQuery, GetUserProfileModel?>
 {
     public async Task<GetUserProfileModel?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
         var user = await userRepository.Set()
-            .Include(u => u.Projects)
+            // .Include(u => u.Projects)
             .Include(u => u.UserSocials)
             .Where(u => u.Id == request.Id)
             .SingleOrDefaultAsync(cancellationToken);

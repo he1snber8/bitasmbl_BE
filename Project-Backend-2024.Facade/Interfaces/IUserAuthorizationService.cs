@@ -1,4 +1,5 @@
 using Project_Backend_2024.DTO;
+using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.AlterModels;
 
 namespace Project_Backend_2024.Facade.Interfaces;
@@ -10,7 +11,7 @@ public interface IUserAuthentication
 
 public interface IUserRegistration
 {
-    Task Register(RegisterUserModel registerModel);
+    Task<User> Register(RegisterUserModel registerModel);
 }
 
 public interface IUserSignOut

@@ -18,44 +18,28 @@ public class UserAuthorizationService(
 {
     public async Task<User> AuthenticateLogin(UserLoginModel loginModel)
     {
-        if (loginModel.LoginType != null &&
-            RegistrationType.Google.ToString().ToLower() != loginModel.LoginType.ToLower() &&
-            RegistrationType.Github.ToString().ToLower() != loginModel.LoginType.ToLower() &&
-            RegistrationType.Standard.ToString().ToLower() != loginModel.LoginType.ToLower())
+        var loginType = loginModel.LoginType?.ToLower()
+            ?? throw new Exception("SSO format cannot be empty");
+
+        if (
+            loginType.ToLower() != RegistrationType.StandardTeamManager.ToString().ToLower() &&
+            loginType.ToLower() != RegistrationType.StandardOrganizationManager.ToString().ToLower() &&
+            loginType.ToLower() != RegistrationType.Google.ToString().ToLower()
+        )
         {
             throw new Exception("SSO format is incorrect");
         }
-        
-        if (RegistrationType.Github.ToString().ToLower() != loginModel.LoginType.ToLower() &&
-            !EmailFormatValidator.IsValidEmail(loginModel!.Email))
+
+        // Validate email format if not Google (can still validate for both if needed)
+        if (!EmailFormatValidator.IsValidEmail(loginModel.Email))
             throw new EmailValidationException();
 
-        if (RegistrationType.Github.ToString().ToLower() == loginModel.LoginType.ToLower())
-        {
-            var githubUser = await userManager.FindByNameAsync(loginModel!.Username)
-                       ?? throw new UserLoginException(loginModel.Username);
-            
-            
-            
-            if (githubUser.LockoutEnd.HasValue && githubUser.LockoutEnd.Value > DateTimeOffset.UtcNow)
-                throw new UserLockedException(githubUser.Email);
-
-            githubUser.LastLogin = DateTime.Now;
-            
-            // await userManager.AddToRoleAsync(githubUser, "User");
-            await userManager.UpdateAsync(githubUser);
-
-            await cookieGenerator.GenerateCookieAndSignIn(githubUser);
-
-            return githubUser;
-        }
-
-        var user = await userManager.FindByEmailAsync(loginModel!.Email)
+        // Get user by email
+        var user = await userManager.FindByEmailAsync(loginModel.Email)
                    ?? throw new UserLoginException(loginModel.Email);
 
-        // Skip password check for Google or Github users
-        // Check password only if it is standard type
-        if (RegistrationType.Standard.ToString().ToLower() == loginModel.LoginType.ToLower() &&
+        // For Standard login, check password
+        if (loginType == RegistrationType.StandardTeamManager.ToString().ToLower() &&
             (string.IsNullOrWhiteSpace(loginModel.Password) ||
              !await userManager.CheckPasswordAsync(user, loginModel.Password)))
         {
@@ -63,14 +47,11 @@ public class UserAuthorizationService(
             throw new UserLoginException(user.UserName, true);
         }
 
+        // Check if user is locked out
         if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
             throw new UserLockedException(user.Email);
 
-        user.LastLogin = DateTime.Now;
-        
-        // await userManager.AddToRoleAsync(user, "User");
         await userManager.UpdateAsync(user);
-
         await cookieGenerator.GenerateCookieAndSignIn(user);
 
         return user;

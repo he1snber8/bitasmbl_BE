@@ -15,7 +15,7 @@ namespace Project_Backend_2024.Services.CommandServices.Users;
 public class UserUpdateCommand(
     IHttpContextAccessor httpContextAccessor,
     IUnitOfWork unitOfWork,
-    IUserRepository userRepository,
+    ITeamManagerRepository userRepository,
     IMapper mapper,
     S3BucketService s3BucketService,
     UserManager<User> userManager) : IRequestHandler<UserUpdateModel, Unit>
@@ -45,10 +45,10 @@ public class UserUpdateCommand(
             await s3BucketService.UploadImageFromUrlToS3Async(request.ImageUrl, key);
         }
 
-        if (request.Balance > 0)
-        {
-            user.Balance += request.Balance;
-        }
+        // if (request.Balance > 0)
+        // {
+        //     user.Balance += request.Balance;
+        // }
 
         if (!string.IsNullOrEmpty(request.Bio))
             user.Bio = request.Bio;

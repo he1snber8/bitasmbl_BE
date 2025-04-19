@@ -28,9 +28,9 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasMaxLength(1024)
             .IsRequired();
 
-        builder.Property(p => p.Applications)
-            .HasColumnType("tinyint")
-            .HasDefaultValue(0);
+        // builder.Property(p => p.Applications)
+        //     .HasColumnType("tinyint")
+        //     .HasDefaultValue(0);
 
         builder.Property(p => p.Status)
             .HasConversion(
@@ -47,10 +47,10 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasColumnType("datetime")
             .HasDefaultValueSql("GETDATE()");
 
-        builder.HasOne(p => p.User)
-            .WithMany(user => user.Projects)
-            .HasForeignKey(p => p.PrincipalId)
-            .IsRequired();
+        // builder.HasOne(p => p.User)
+        //     .WithMany(user => user.Projects)
+        //     .HasForeignKey(p => p.PrincipalId)
+        //     .IsRequired();
         
         builder.HasMany(p => p.ProjectApplications)
             .WithOne(pa => pa.Project)
@@ -67,8 +67,8 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasForeignKey(pa => pa.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        builder.Property(p => p.GithubRepo)
-            .HasColumnType("varchar")
-            .HasMaxLength(256);
+        // builder.Property(p => p.GithubRepo)
+        //     .HasColumnType("varchar")
+        //     .HasMaxLength(256);
     }
 }

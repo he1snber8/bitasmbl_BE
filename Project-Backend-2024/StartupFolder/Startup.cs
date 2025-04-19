@@ -1,6 +1,5 @@
 ﻿using Project_Backend_2024.Services;
-using Project_Backend_2024.Services.CommandServices.Skills;
-
+using Project_Backend_2024.Services.CommandServices.Requirements;
 namespace Project_Backend_2024.StartupFolder;
 
 internal static partial class Startup
@@ -16,7 +15,7 @@ internal static partial class Startup
         services.ConfigureServices();
         services.AddMediatR(config =>
         {
-            config.RegisterServicesFromAssemblies(typeof(AddSkillCommand).Assembly);
+            config.RegisterServicesFromAssemblies(typeof(AddRequirementCommand).Assembly);
         });
         
         services.AddAutoMapper(typeof(Mappers).Assembly);

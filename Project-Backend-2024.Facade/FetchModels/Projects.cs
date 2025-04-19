@@ -30,12 +30,21 @@ public record GetProjectApplicationModel(
     int Id,
     string? CoverLetter,
     string? ApplicationStatus,
-    int ProjectId,
-    string PrincipalId,
-    double QuizScore,
+    // int ProjectId,
+    // int TeamId,
+    GetClientProjectModel GetClientProjectModel,
     List<string> SelectedAndAppliedRequirements,
-    GetUserModel? Applicant);
-    
+    GetTeamModel? Team);
+
+// public string? CoverLetter { get; set; }
+//
+// public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
+//
+// public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
+//     
+// public Team? Team { get; set; }
+// public Project Project { get; set; }
+//     
     
 public class GetClientProjectModel
 {

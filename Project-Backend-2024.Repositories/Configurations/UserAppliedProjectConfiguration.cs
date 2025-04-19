@@ -27,10 +27,10 @@ internal class UserAppliedProjectConfiguration : IEntityTypeConfiguration<UserAp
             .HasColumnType("nvarchar")
             .HasMaxLength(450);
         
-        builder.HasOne(ap => ap.User)
-            .WithMany(a => a.AppliedProjects)
-            .HasForeignKey(ap => ap.UserId)
-            .OnDelete(DeleteBehavior.NoAction);
+        // builder.HasOne(ap => ap.User)
+        //     .WithMany(a => a.AppliedProjects)
+        //     .HasForeignKey(ap => ap.UserId)
+        //     .OnDelete(DeleteBehavior.NoAction);
         
         builder.HasOne(ap => ap.Project)
             .WithMany()

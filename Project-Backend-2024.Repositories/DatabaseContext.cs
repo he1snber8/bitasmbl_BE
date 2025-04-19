@@ -17,12 +17,14 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> opts) : IdentityD
     public DbSet<UserSocialLink> UserSocialLinks { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Requirement> Requirements { get; set; }
-    public DbSet<RequirementTest> RequirementsTests { get; set; }
+    public DbSet<Organization> Organizations { get; set; }
+    public DbSet<Team> Teams { get; set; }
+    // public DbSet<RequirementTest> RequirementsTests { get; set; }
     // public DbSet<ProjectTask> ProjectTasks { get; set; }
     // public DbSet<ProjectSubTask> ProjectSubTasks { get; set; }
     public DbSet<Project> Projects { get; set; }
-    public DbSet<Skill> Skills { get; set; }
-    public DbSet<UserSkills> UserSkills { get; set; }
+    // public DbSet<Skill> Skills { get; set; }
+    // public DbSet<UserSkills> UserSkills { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,20 +35,34 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> opts) : IdentityD
         modelBuilder.ApplyConfiguration(new ProjectApplicationConfiguration());
         modelBuilder.ApplyConfiguration(new UserAppliedProjectConfiguration());
         modelBuilder.ApplyConfiguration(new UserSocialLinkConfiguration());
-        modelBuilder.ApplyConfiguration(new SkillsConfiguration());
-        modelBuilder.ApplyConfiguration(new UserSkillsConfiguration());
+        modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
+        modelBuilder.ApplyConfiguration(new TeamConfiguration());
+        modelBuilder.ApplyConfiguration(new TeamManagerConfiguration());
+        modelBuilder.ApplyConfiguration(new OrganizationManagerConfiguration());
+        // modelBuilder.ApplyConfiguration(new SkillsConfiguration());
+        // modelBuilder.ApplyConfiguration(new UserSkillsConfiguration());
         modelBuilder.ApplyConfiguration(new RequirementConfiguration());
         modelBuilder.ApplyConfiguration(new CategoryConfiguration());
         modelBuilder.ApplyConfiguration(new ProjectRequirementConfiguration());
         // modelBuilder.ApplyConfiguration(new ProjectTaskConfiguration());
         // modelBuilder.ApplyConfiguration(new ProjectSubTaskConfiguration());
-        modelBuilder.ApplyConfiguration(new RequirementTestConfiguration());
+        // modelBuilder.ApplyConfiguration(new RequirementTestConfiguration());
         modelBuilder.ApplyConfiguration(new ProjectCategoryConfiguration());
         modelBuilder.ApplyConfiguration(new ProjectImagesConfiguration());
-        modelBuilder.ApplyConfiguration(new TransactionConfiguration());
+        // modelBuilder.ApplyConfiguration(new TransactionConfiguration());
 
         const string adminId = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
         const string roleId = adminId;
+        
+        // const int adminTeamId = 1;
+        //
+        // modelBuilder.Entity<Team>().HasData(new Team
+        // {
+        //     Id = adminTeamId,
+        //     Name = "Admin Team",
+        //     ContactEmail = "admin@example.com",
+        //     ContactName = "Admin"
+        // });
         
         modelBuilder.Entity<IdentityRole>().HasData(
             new IdentityRole
@@ -64,10 +80,13 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> opts) : IdentityD
         
         var hasher = new PasswordHasher<User>();
         
-        modelBuilder.Entity<User>().HasData(new User
+        modelBuilder.Entity<TeamManager>().HasData(new TeamManager
         {
             Id = adminId,
             UserName = "admin",
+            FirstName = "Luka",
+            LastName = "Khaja",
+            Role = "Back-End Developer",
             NormalizedUserName = "admin",
             Email = "lukakhaja@yahoo.com",
             NormalizedEmail = "lukakhaja@yahoo.com".ToUpper(),

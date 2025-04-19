@@ -12,7 +12,7 @@ public record CreateProjectModel(
     string? GithubRepo,
     ushort CreationCost,
     List<ProjectRequirementModel> ProjectRequirements,
-    List<ProjectLink>? ProjectLinks,
+    // List<ProjectLink>? ProjectLinks,
     List<int> CategoryIds) : IRequest<int>;
 
 public record ProjectRequirementModel(

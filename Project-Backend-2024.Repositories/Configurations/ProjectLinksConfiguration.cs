@@ -10,10 +10,10 @@ public class ProjectLinksConfiguration : IEntityTypeConfiguration<ProjectLink>
     {
         builder.HasKey(pi => new { pi.Id, pi.ProjectId, pi.UrlName, pi.UrlValue });
 
-        builder.HasOne(pi => pi.Project)
-            .WithMany(p => p.ProjectLinks)
-            .HasForeignKey(pi => pi.ProjectId)
-            .IsRequired();
+        // builder.HasOne(pi => pi.Project)
+        //     .WithMany(p => p.ProjectLinks)
+        //     .HasForeignKey(pi => pi.ProjectId)
+        //     .IsRequired();
 
         builder.Property(c => c.UrlName)
             .HasColumnType("nvarchar(128)")

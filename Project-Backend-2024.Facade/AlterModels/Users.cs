@@ -5,14 +5,15 @@ namespace Project_Backend_2024.Facade.AlterModels;
 
 public record UserSkillsModel(GetSkillsModel Skills);
 
-public record UserLoginModel(string? Email, string? Username, string? Password, string? LoginType = "Standard");
+public record UserLoginModel(string? Email, string? Password, string? LoginType);
 
 public record RegisterUserModel(
-    string Username,
+    string FirstName,
+    string LastName,
     string? Email,
     string? ImageUrl,
     string? Password,
-    string? RegistrationType = "Standard");
+    string? RegistrationType);
 
 public record UserUpdateModel(
     string? UserName,

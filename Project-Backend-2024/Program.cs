@@ -38,7 +38,7 @@ var allowedOrigin1 = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN_1") ?? "
 var allowedOrigin2 = Environment.GetEnvironmentVariable("ALLOWED_ORIGIN_2") ?? "";
 
 var app = builder.Build();
-app.UseCors(policy => policy.WithOrigins(allowedOrigin1, allowedOrigin2, "http://localhost:3000")
+app.UseCors(policy => policy.WithOrigins(allowedOrigin1, allowedOrigin2, "http://localhost:5173")
     .AllowAnyMethod().AllowCredentials().AllowAnyHeader());
 
 app.UseCors();

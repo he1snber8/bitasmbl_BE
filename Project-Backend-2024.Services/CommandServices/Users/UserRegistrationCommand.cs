@@ -1,9 +1,12 @@
+using System.Data;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Project_Backend_2024.DTO;
 using Project_Backend_2024.DTO.Enums;
+using Project_Backend_2024.DTO.Interfaces;
 using Project_Backend_2024.Facade.AlterModels;
 using Project_Backend_2024.Facade.Exceptions;
+using Project_Backend_2024.Facade.FetchModels;
 using Project_Backend_2024.Facade.Interfaces;
 using Project_Backend_2024.Services.Authentication.CookieGenerators;
 using Project_Backend_2024.Services.CommandServices.AWS;
@@ -20,89 +23,97 @@ public class UserRegistrationCommand(
     IUnitOfWork unitOfWork,
     IEmailService emailService) : IUserRegistration
 {
-    public async Task Register(RegisterUserModel registerModel)
+    public async Task<User> Register(RegisterUserModel registerModel)
     {
-        // Check if the email is already registered
-        var existingUser = registerModel.Email is null
-            ? await userManager.FindByEmailAsync(registerModel.Username)
-            : await userManager.FindByEmailAsync(registerModel.Email);
+        var registrationType = registerModel.RegistrationType?.Trim().ToLower();
+
+        // STEP 1: Check for existing user by Email
+        var existingUser = await userManager.FindByEmailAsync(registerModel.Email);
 
         if (existingUser != null)
         {
             var roles = await userManager.GetRolesAsync(existingUser);
             if (!roles.Contains("User"))
-            {
                 await userManager.AddToRoleAsync(existingUser, "User");
-            }
 
-            if (registerModel.RegistrationType?.ToLower() != RegistrationType.Standard.ToString().ToLower()
-                && registerModel.Username == existingUser.UserName)
+            // For non-team manager registrations, throw if same username is found
+            if (registerModel.FirstName == existingUser.FirstName && registerModel.LastName == existingUser.LastName)
             {
                 await userAuthentication.AuthenticateLogin(new UserLoginModel(
                     registerModel.Email,
-                    null,
-                    null,
-                    registerModel.RegistrationType));
+                    // $"{registerModel.FirstName}_{registerModel.LastName}",
+                    registerModel.Password,
+                    registerModel.RegistrationType
+                ));
 
                 throw new EmailAlreadyExistsException(registerModel.Email, registerModel.RegistrationType);
             }
         }
 
-
-        // Validate email format if user isn't using github login
-        if (registerModel.RegistrationType?.ToLower() != RegistrationType.Github.ToString().ToLower() &&
-            !EmailFormatValidator.IsValidEmail(registerModel.Email))
-            throw new EmailValidationException();
-
-        // Map registration model to User entity
-        var user = mapper.Map<User>(registerModel);
-        user.DateJoined = DateTime.Now;
-
-        if (registerModel.RegistrationType?.ToLower() == RegistrationType.Standard.ToString().ToLower())
+        // STEP 2: Map to proper User subtype based on RegistrationType
+        var user = registrationType switch
         {
-            // For standard registration, hash the provided password
+            var type when type == RegistrationType.StandardTeamManager.ToString().ToLower() => mapper.Map<TeamManager>(
+                registerModel),
+            var type when type == RegistrationType.StandardOrganizationManager.ToString().ToLower() => mapper
+                .Map<OrganizationManager>(registerModel),
+            var type when type == RegistrationType.Google.ToString().ToLower() => mapper.Map<User>(registerModel),
+            _ => throw new InvalidOperationException($"Unsupported registration type: {registerModel.RegistrationType}")
+        };
+
+        // STEP 3: Set password for standard user, or , if registered as Google account, set it as a random guid
+
+        if (registrationType == RegistrationType.StandardTeamManager.ToString().ToLower() ||
+            registrationType == RegistrationType.StandardOrganizationManager.ToString().ToLower())
+        {
+            if (registerModel.Password == null) throw new PasswordValidationException("Password must not be empty");
+
             user.PasswordHash = passwordHasher.HashPassword(user, registerModel.Password);
         }
         else
         {
-            // For SSO registrations, mark email as confirmed and set dummy password
+            // var googleUser = (GoogleUser)registerModel;
             user.EmailConfirmed = true;
-            user.PasswordHash = passwordHasher.HashPassword(user, Guid.NewGuid().ToString());
+            // user.FirstName = user.f;
+            // user.FirstName = (GoogleUser)user.las;
+            // user.PasswordHash = passwordHasher.HashPassword(user, Guid.NewGuid().ToString());
         }
 
-        // Create user in the system
-        IdentityResult creationResult;
+        // ✅ Ensure UserName is always set — Identity requires it
+        if (string.IsNullOrWhiteSpace(user.UserName))
+        {
+            user.UserName = (registerModel.Email ?? $"{registerModel.FirstName}_{registerModel.LastName}")
+                .Replace(" ", "_").ToLower();
+        }
 
-        if (registerModel.RegistrationType?.ToLower() == RegistrationType.Standard.ToString().ToLower())
-        {
-            // Standard registration requires a password
-            creationResult = await userManager.CreateAsync(user, registerModel.Password);
-        }
-        else
-        {
-            // SSO registration does not require a password
-            
-            user.UserName = user.UserName?.Replace(" ", "_");
-            creationResult = await userManager.CreateAsync(user);
-        }
+
+        // STEP 4: Create the user
+        var isStandardRegistration =
+            registrationType == RegistrationType.StandardTeamManager.ToString().ToLower() ||
+            registrationType == RegistrationType.StandardOrganizationManager.ToString().ToLower();
+
+        var creationResult = isStandardRegistration
+            ? await userManager.CreateAsync(user, registerModel.Password)
+            : await userManager.CreateAsync(user);
 
         if (!creationResult.Succeeded)
-        {
             HandleIdentityErrors(creationResult);
-        }
 
-        // Add user to default role and generate sign-in cookie
+        // STEP 5: Assign to role and sign in
         await userManager.AddToRoleAsync(user, "User");
         await cookieGenerator.GenerateCookieAndSignIn(user);
 
-        // Handle email confirmation for standard registration
-        if (registerModel.RegistrationType?.ToLower() == RegistrationType.Standard.ToString().ToLower())
-        {
-            await SendEmailConfirmationAsync(user, registerModel.Email);
-        }
+        // STEP 6: Email confirmation for standard registration
+        // if (registrationType == RegistrationType.StandardTeamManager.ToString().ToLower())
+        // {
+        //     await SendEmailConfirmationAsync(user, registerModel.Email);
+        // }
 
         await unitOfWork.SaveChangesAsync();
+
+        return user;
     }
+
 
     private async Task SendEmailConfirmationAsync(User user, string email)
     {
@@ -138,7 +149,7 @@ public class UserRegistrationCommand(
                 case "PasswordRequiresNonAlphanumeric":
                     throw new PasswordValidationException("Password must contain at least one symbol.");
                 case "DuplicateUserName":
-                    throw new EntityAlreadyExistsException(error.Description);
+                    throw new DuplicateNameException();
                 default:
                     throw new IdentityException(creationResult.Errors);
             }

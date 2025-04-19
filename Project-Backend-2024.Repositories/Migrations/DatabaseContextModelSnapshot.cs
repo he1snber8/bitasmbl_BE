@@ -57,7 +57,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                         },
                         new
                         {
-                            Id = "0bb182a2-8289-4441-92ac-9e84e5e143f6",
+                            Id = "c2acaed3-6db5-41ce-b1be-73c4b087bc89",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -201,7 +201,7 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Project_Backend_2024.DTO.Project", b =>
+            modelBuilder.Entity("Project_Backend_2024.DTO.Organization", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -209,10 +209,54 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte>("Applications")
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar");
+
+                    b.Property<string>("Industry")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<int>("OrganizationSize")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WebsiteUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Organizations");
+                });
+
+            modelBuilder.Entity("Project_Backend_2024.DTO.Project", b =>
+                {
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint")
-                        .HasDefaultValue((byte)0);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DateCreated")
                         .ValueGeneratedOnAdd()
@@ -223,10 +267,6 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar");
-
-                    b.Property<string>("GithubRepo")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -250,12 +290,16 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasColumnType("varchar")
                         .HasDefaultValueSql("'Active'");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.HasIndex("PrincipalId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Projects");
                 });
@@ -268,48 +312,39 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicantId")
-                        .IsRequired()
+                    b.Property<string>("CoverLetter")
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar");
 
-                    b.Property<string>("ApplicationStatus")
+                    b.Property<DateTime>("DateApplied")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("varchar")
                         .HasDefaultValueSql("'Pending'");
 
-                    b.Property<string>("CoverLetter")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar");
-
-                    b.Property<DateTime?>("DateApplied")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<string>("PrincipalId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar");
-
-                    b.Property<int>("ProjectId")
+                    b.Property<int>("TeamId")
                         .HasColumnType("int");
 
-                    b.Property<double>("QuizScore")
-                        .HasColumnType("float");
-
-                    b.Property<string>("SelectedAndAppliedRequirements")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("TeamId1")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicantId");
-
-                    b.HasIndex("PrincipalId");
-
-                    b.HasIndex("ProjectId", "ApplicantId")
+                    b.HasIndex("ProjectId")
                         .IsUnique();
+
+                    b.HasIndex("TeamId");
+
+                    b.HasIndex("TeamId1");
 
                     b.ToTable("ProjectApplications");
                 });
@@ -340,32 +375,6 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.HasKey("ProjectId", "ImageUrl");
 
                     b.ToTable("ProjectImages");
-                });
-
-            modelBuilder.Entity("Project_Backend_2024.DTO.ProjectLink", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UrlName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UrlValue")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("ProjectLink");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.ProjectRequirement", b =>
@@ -409,15 +418,20 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Requirements", (string)null);
                 });
 
-            modelBuilder.Entity("Project_Backend_2024.DTO.RequirementTest", b =>
+            modelBuilder.Entity("Project_Backend_2024.DTO.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -425,52 +439,83 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Answers")
+                    b.Property<string>("CompanyProfileUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("ContactEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(512)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
 
-                    b.Property<string>("CorrectAnswer")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar");
+                    b.Property<string>("ContactName")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar");
 
-                    b.Property<string>("Question")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar");
+                    b.Property<string>("Location")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
 
-                    b.Property<int>("RequirementId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RequirementId");
-
-                    b.HasIndex("Id", "RequirementId")
-                        .IsUnique();
-
-                    b.ToTable("RequirementTests", (string)null);
-                });
-
-            modelBuilder.Entity("Project_Backend_2024.DTO.Skill", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
 
+                    b.Property<int>("TeamManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearsInOperation")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.ToTable("Teams");
+                });
 
-                    b.ToTable("Skills");
+            modelBuilder.Entity("Project_Backend_2024.DTO.TeamMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinkedInUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResumeUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("TeamMember");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.Transaction", b =>
@@ -482,39 +527,30 @@ namespace Project_Backend_2024.Repositories.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("varchar(3)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaypalTransactionId")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TransactionType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PaypalTransactionId");
 
                     b.HasIndex("UserId");
 
@@ -529,11 +565,6 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<short>("Balance")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)15);
-
                     b.Property<string>("Bio")
                         .HasColumnType("varchar(255)");
 
@@ -541,10 +572,10 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DateJoined")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("GETDATE()");
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(50)
@@ -553,16 +584,24 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar");
+
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("varchar(2048)");
+                        .HasMaxLength(1048)
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<DateTime?>("LastLogin")
-                        .HasColumnType("datetime");
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -588,11 +627,12 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("RegistrationType")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar")
-                        .HasDefaultValueSql("'Standard'");
+                    b.Property<int?>("RegistrationType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResumeUrl")
+                        .HasMaxLength(1048)
+                        .HasColumnType("varchar");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -624,25 +664,9 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.HasData(
-                        new
-                        {
-                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            AccessFailedCount = 0,
-                            Balance = (short)0,
-                            ConcurrencyStamp = "7be08614-064d-42a6-8900-bff9e737397e",
-                            Email = "lukakhaja@yahoo.com",
-                            EmailConfirmed = true,
-                            IsDeleted = false,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "LUKAKHAJA@YAHOO.COM",
-                            NormalizedUserName = "admin",
-                            PasswordHash = new byte[] { 65, 81, 65, 65, 65, 65, 73, 65, 65, 89, 97, 103, 65, 65, 65, 65, 69, 66, 70, 106, 48, 65, 88, 81, 49, 68, 115, 67, 51, 78, 90, 90, 114, 72, 106, 113, 106, 48, 47, 70, 81, 116, 119, 103, 112, 84, 57, 43, 109, 103, 84, 80, 117, 81, 111, 120, 116, 78, 88, 113, 111, 111, 122, 48, 117, 87, 43, 54, 67, 116, 76, 52, 67, 49, 120, 86, 78, 122, 80, 106, 57, 119, 61, 61 },
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "",
-                            TwoFactorEnabled = false,
-                            UserName = "admin"
-                        });
+                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.UserAppliedProject", b =>
@@ -678,22 +702,6 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.ToTable("UserAppliedProjects");
                 });
 
-            modelBuilder.Entity("Project_Backend_2024.DTO.UserSkills", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "SkillId");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("UserSkills");
-                });
-
             modelBuilder.Entity("Project_Backend_2024.DTO.UserSocialLink", b =>
                 {
                     b.Property<int>("Id")
@@ -711,14 +719,101 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("UserId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.HasIndex("Id", "UserId", "SocialUrl")
                         .IsUnique();
 
                     b.ToTable("UserSocialLinks");
+                });
+
+            modelBuilder.Entity("RequirementTeamManager", b =>
+                {
+                    b.Property<string>("TeamManagerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UserRequirementSkillsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TeamManagerId", "UserRequirementSkillsId");
+
+                    b.HasIndex("UserRequirementSkillsId");
+
+                    b.ToTable("RequirementTeamManager");
+                });
+
+            modelBuilder.Entity("Project_Backend_2024.DTO.OrganizationManager", b =>
+                {
+                    b.HasBaseType("Project_Backend_2024.DTO.User");
+
+                    b.Property<string>("Department")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar");
+
+                    b.Property<bool>("IsVerified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasDiscriminator().HasValue("OrganizationManager");
+                });
+
+            modelBuilder.Entity("Project_Backend_2024.DTO.TeamManager", b =>
+                {
+                    b.HasBaseType("Project_Backend_2024.DTO.User");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar");
+
+                    b.Property<string>("SocialPortfolioUrl")
+                        .HasMaxLength(1048)
+                        .HasColumnType("varchar");
+
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("TeamId")
+                        .IsUnique()
+                        .HasFilter("[TeamId] IS NOT NULL");
+
+                    b.HasDiscriminator().HasValue("TeamManager");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "22129425-2a7d-452e-b9ec-f4d1c40b3683",
+                            Email = "lukakhaja@yahoo.com",
+                            EmailConfirmed = true,
+                            FirstName = "Luka",
+                            IsDeleted = false,
+                            LastName = "Khaja",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "LUKAKHAJA@YAHOO.COM",
+                            NormalizedUserName = "admin",
+                            PasswordHash = new byte[] { 65, 81, 65, 65, 65, 65, 73, 65, 65, 89, 97, 103, 65, 65, 65, 65, 69, 74, 87, 106, 47, 82, 56, 49, 90, 79, 56, 57, 65, 89, 110, 83, 107, 97, 76, 84, 107, 67, 115, 49, 111, 102, 80, 72, 99, 75, 80, 102, 99, 78, 43, 56, 98, 121, 50, 84, 56, 111, 55, 116, 70, 55, 68, 78, 43, 119, 112, 68, 109, 56, 82, 118, 51, 99, 74, 70, 90, 48, 67, 120, 108, 65, 61, 61 },
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "",
+                            TwoFactorEnabled = false,
+                            UserName = "admin",
+                            Role = "Back-End Developer"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -774,9 +869,9 @@ namespace Project_Backend_2024.Repositories.Migrations
 
             modelBuilder.Entity("Project_Backend_2024.DTO.Project", b =>
                 {
-                    b.HasOne("Project_Backend_2024.DTO.User", "User")
-                        .WithMany("Projects")
-                        .HasForeignKey("PrincipalId")
+                    b.HasOne("Project_Backend_2024.DTO.TeamManager", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -785,25 +880,25 @@ namespace Project_Backend_2024.Repositories.Migrations
 
             modelBuilder.Entity("Project_Backend_2024.DTO.ProjectApplication", b =>
                 {
-                    b.HasOne("Project_Backend_2024.DTO.User", "Applicant")
-                        .WithMany()
-                        .HasForeignKey("ApplicantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project_Backend_2024.DTO.User", null)
-                        .WithMany("ProjectApplications")
-                        .HasForeignKey("PrincipalId");
-
                     b.HasOne("Project_Backend_2024.DTO.Project", "Project")
                         .WithMany("ProjectApplications")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Applicant");
+                    b.HasOne("Project_Backend_2024.DTO.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Project_Backend_2024.DTO.Team", null)
+                        .WithMany("ProjectApplications")
+                        .HasForeignKey("TeamId1");
 
                     b.Navigation("Project");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.ProjectCategory", b =>
@@ -828,18 +923,7 @@ namespace Project_Backend_2024.Repositories.Migrations
             modelBuilder.Entity("Project_Backend_2024.DTO.ProjectImage", b =>
                 {
                     b.HasOne("Project_Backend_2024.DTO.Project", "Project")
-                        .WithMany("ProjectImages")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("Project_Backend_2024.DTO.ProjectLink", b =>
-                {
-                    b.HasOne("Project_Backend_2024.DTO.Project", "Project")
-                        .WithMany("ProjectLinks")
+                        .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -866,23 +950,31 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Navigation("Requirement");
                 });
 
-            modelBuilder.Entity("Project_Backend_2024.DTO.RequirementTest", b =>
+            modelBuilder.Entity("Project_Backend_2024.DTO.Requirement", b =>
                 {
-                    b.HasOne("Project_Backend_2024.DTO.Requirement", "Requirement")
-                        .WithMany("RequirementTests")
-                        .HasForeignKey("RequirementId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("Project_Backend_2024.DTO.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Project_Backend_2024.DTO.TeamMember", b =>
+                {
+                    b.HasOne("Project_Backend_2024.DTO.Team", "Team")
+                        .WithMany("Members")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Requirement");
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.Transaction", b =>
                 {
                     b.HasOne("Project_Backend_2024.DTO.User", "User")
-                        .WithMany("Transactions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -896,9 +988,9 @@ namespace Project_Backend_2024.Repositories.Migrations
                         .IsRequired();
 
                     b.HasOne("Project_Backend_2024.DTO.User", "User")
-                        .WithMany("AppliedProjects")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -906,34 +998,57 @@ namespace Project_Backend_2024.Repositories.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Project_Backend_2024.DTO.UserSkills", b =>
+            modelBuilder.Entity("Project_Backend_2024.DTO.UserSocialLink", b =>
                 {
-                    b.HasOne("Project_Backend_2024.DTO.Skill", "Skill")
-                        .WithMany("UserSkills")
-                        .HasForeignKey("SkillId")
+                    b.HasOne("Project_Backend_2024.DTO.TeamManager", null)
+                        .WithMany("UserSocials")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Project_Backend_2024.DTO.TeamManager", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Project_Backend_2024.DTO.User", "User")
-                        .WithMany("UserSkills")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Skill");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Project_Backend_2024.DTO.UserSocialLink", b =>
+            modelBuilder.Entity("RequirementTeamManager", b =>
                 {
-                    b.HasOne("Project_Backend_2024.DTO.User", "User")
-                        .WithMany("UserSocials")
-                        .HasForeignKey("UserId")
+                    b.HasOne("Project_Backend_2024.DTO.TeamManager", null)
+                        .WithMany()
+                        .HasForeignKey("TeamManagerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Project_Backend_2024.DTO.Requirement", null)
+                        .WithMany()
+                        .HasForeignKey("UserRequirementSkillsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Project_Backend_2024.DTO.OrganizationManager", b =>
+                {
+                    b.HasOne("Project_Backend_2024.DTO.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Project_Backend_2024.DTO.TeamManager", b =>
+                {
+                    b.HasOne("Project_Backend_2024.DTO.Team", "Team")
+                        .WithOne("TeamManager")
+                        .HasForeignKey("Project_Backend_2024.DTO.TeamManager", "TeamId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Project_Backend_2024.DTO.Project", b =>
@@ -942,35 +1057,21 @@ namespace Project_Backend_2024.Repositories.Migrations
 
                     b.Navigation("ProjectCategories");
 
-                    b.Navigation("ProjectImages");
-
-                    b.Navigation("ProjectLinks");
-
                     b.Navigation("ProjectRequirements");
                 });
 
-            modelBuilder.Entity("Project_Backend_2024.DTO.Requirement", b =>
+            modelBuilder.Entity("Project_Backend_2024.DTO.Team", b =>
                 {
-                    b.Navigation("RequirementTests");
-                });
-
-            modelBuilder.Entity("Project_Backend_2024.DTO.Skill", b =>
-                {
-                    b.Navigation("UserSkills");
-                });
-
-            modelBuilder.Entity("Project_Backend_2024.DTO.User", b =>
-                {
-                    b.Navigation("AppliedProjects");
+                    b.Navigation("Members");
 
                     b.Navigation("ProjectApplications");
 
-                    b.Navigation("Projects");
+                    b.Navigation("TeamManager")
+                        .IsRequired();
+                });
 
-                    b.Navigation("Transactions");
-
-                    b.Navigation("UserSkills");
-
+            modelBuilder.Entity("Project_Backend_2024.DTO.TeamManager", b =>
+                {
                     b.Navigation("UserSocials");
                 });
 #pragma warning restore 612, 618

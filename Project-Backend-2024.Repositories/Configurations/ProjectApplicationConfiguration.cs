@@ -11,9 +11,9 @@ public class ProjectApplicationConfiguration : IEntityTypeConfiguration<ProjectA
     {
         builder.HasKey(ap => ap.Id);
 
-        builder.HasIndex(p => new { p.ProjectId, p.ApplicantId}).IsUnique();
+        builder.HasIndex(p => new { p.ProjectId }).IsUnique();
 
-        builder.Property(ap => ap.ApplicationStatus)
+        builder.Property(ap => ap.Status)
             .HasConversion(
                 v => v.ToString()!,
                 v => (ApplicationStatus)Enum.Parse(typeof(ApplicationStatus), v))
@@ -25,25 +25,18 @@ public class ProjectApplicationConfiguration : IEntityTypeConfiguration<ProjectA
             .HasColumnType("datetime")
             .HasDefaultValueSql("GETDATE()");
 
-        builder.Property(ap => ap.ApplicantId)
-            .HasColumnType("nvarchar")
-            .HasMaxLength(450);
-        
-        builder.Property(ap => ap.PrincipalId)
-            .HasColumnType("nvarchar")
-            .HasMaxLength(450);
-
         builder.Property(ap => ap.CoverLetter)
             .HasColumnType("nvarchar")
             .HasMaxLength(450);
         
-        builder.HasOne(ap => ap.Applicant)
+        builder.HasOne(ap => ap.Team)
             .WithMany()
-            .HasForeignKey(ap => ap.ApplicantId);
+            .HasForeignKey(ap => ap.TeamId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(ap => ap.Project)
             .WithMany(a => a.ProjectApplications)
             .HasForeignKey(ap => ap.ProjectId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

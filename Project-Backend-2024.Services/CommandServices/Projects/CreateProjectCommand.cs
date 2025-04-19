@@ -34,17 +34,17 @@ public class CreateProjectCommand(
 
         var project = mapper.Map<Project>(request);
 
-        if (user.Balance - request.CreationCost < 0)
-        {
-            throw new InsufficientFundsException();
-        }
+        // if (user.Balance - request.CreationCost < 0)
+        // {
+        //     throw new InsufficientFundsException();
+        // }
         
         project.PrincipalId = userId;
-        user.Balance -= request.CreationCost;
+        // user.Balance -= request.CreationCost;
         
         LinkProjectRequirements(request.ProjectRequirements, project);
         LinkProjectCategories(request.CategoryIds, project);
-        LinkProjectUsefulLinks(request.ProjectLinks, project);
+        // LinkProjectUsefulLinks(request.ProjectLinks, project);
         
         projectRepository.Insert(project);
 
@@ -86,18 +86,18 @@ public class CreateProjectCommand(
             .ToList();
     }
 
-    private void LinkProjectUsefulLinks(List<ProjectLink>? projectLinks, Project project)
-    {
-        
-        project.ProjectLinks = projectLinks
-            .Select(pk => new ProjectLink
-            {
-                ProjectId = project.Id,
-                UrlName = pk.UrlName,
-                UrlValue = pk.UrlValue
-            })
-            .ToList();
-    }
+    // private void LinkProjectUsefulLinks(List<ProjectLink>? projectLinks, Project project)
+    // {
+    //     
+    //     project.ProjectLinks = projectLinks
+    //         .Select(pk => new ProjectLink
+    //         {
+    //             ProjectId = project.Id,
+    //             UrlName = pk.UrlName,
+    //             UrlValue = pk.UrlValue
+    //         })
+    //         .ToList();
+    // }
 
     private void ValidateRequest(CreateProjectModel request)
     {

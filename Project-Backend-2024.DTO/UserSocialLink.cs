@@ -7,6 +7,6 @@ public class UserSocialLink : IEntity
     public int Id { get; }
     public required string UserId { get; set; }
     public required string SocialUrl { get; set; }
-    public required User User { get; set; }
+    public required TeamManager User { get; set; }
     
 }

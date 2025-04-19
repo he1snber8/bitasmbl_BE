@@ -134,48 +134,48 @@ public class ProjectsController(
         }
     }
 
-    [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
-    [HttpPost("apply")]
-    public async Task<IActionResult> ApplyProjectCommand([FromBody] ApplyToProjectModel applyToProjectModel)
-    {
-        try
-        {
-            var appliedProject = await sender.Send(applyToProjectModel);
-            // await projectsHub.Clients.All.SendAsync("ProjectApplied", appliedProject);
-            await projectsHub.Clients.Group($"principal_{appliedProject.PrincipalId}")
-                .SendAsync("ProjectApplied", appliedProject);
-
-            
-            Console.WriteLine($"User applied and message sent to a group: principal_{appliedProject.PrincipalId}");
-
-            return Ok(appliedProject);
-        }
-        catch (UserNotFoundException ex)
-        {
-            return BadRequest(new { message = "User not found" });
-        }
-        catch (InvalidProjectStatusException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (AlreadyAppliedException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (ProjectMaxApplicationLimitException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("{Date}: Unexpected error: {Message}", DateTime.Now, ex.Message);
-            return StatusCode(500, new { message = ex.Message });
-        }
-    }
+    // [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
+    // [HttpPost("apply")]
+    // public async Task<IActionResult> ApplyProjectCommand([FromBody] ApplyToProjectModel applyToProjectModel)
+    // {
+    //     try
+    //     {
+    //         var appliedProject = await sender.Send(applyToProjectModel);
+    //         // await projectsHub.Clients.All.SendAsync("ProjectApplied", appliedProject);
+    //         await projectsHub.Clients.Group($"principal_{appliedProject.PrincipalId}")
+    //             .SendAsync("ProjectApplied", appliedProject);
+    //
+    //         
+    //         Console.WriteLine($"User applied and message sent to a group: principal_{appliedProject.PrincipalId}");
+    //
+    //         return Ok(appliedProject);
+    //     }
+    //     catch (UserNotFoundException ex)
+    //     {
+    //         return BadRequest(new { message = "User not found" });
+    //     }
+    //     catch (InvalidProjectStatusException ex)
+    //     {
+    //         return BadRequest(new { message = ex.Message });
+    //     }
+    //     catch (AlreadyAppliedException ex)
+    //     {
+    //         return BadRequest(new { message = ex.Message });
+    //     }
+    //     catch (ProjectMaxApplicationLimitException ex)
+    //     {
+    //         return BadRequest(new { message = ex.Message });
+    //     }
+    //     catch (InvalidOperationException ex)
+    //     {
+    //         return BadRequest(new { message = ex.Message });
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         logger.LogError("{Date}: Unexpected error: {Message}", DateTime.Now, ex.Message);
+    //         return StatusCode(500, new { message = ex.Message });
+    //     }
+    // }
 
     [Authorize(AuthenticationSchemes = "Cookies", Policy = "AdminOrUser")]
     [HttpPost("images/upload")]

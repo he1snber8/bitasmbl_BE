@@ -10,11 +10,14 @@ public class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> logger) : I
     private readonly DatabaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
     private readonly ILogger<UnitOfWork> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-    private readonly Lazy<IUserRepository> _userRepository = new(() => new UserRepository(context));
+    // private readonly Lazy<IUserRepository> _userRepository = new(() => new UserRepository(context));
     private readonly Lazy<IProjectRepository> _projectRepository = new(() => new ProjectRepository(context));
+    
+    private readonly Lazy<ITeamManagerRepository> _teamManagerRepository = new(() => new TeamManagerRepository(context));
+    private readonly Lazy<IOrganizationManagerRepository> _organizationManagerRepository = new(() => new OrganizationManagerRepository(context));
 
-    private readonly Lazy<IUserSkillsRepository> _userSkillsRepository = new(() => new UserSkillsRepository(context));
-    private readonly Lazy<ISkillRepository> _skillRepository = new(() => new SkillRepository(context));
+    private readonly Lazy<IOrganizationRepository> _userSkillsRepository = new(() => new OrganizationRepository(context));
+    private readonly Lazy<ITeamRepository> _skillRepository = new(() => new TeamRepository(context));
     
     private readonly Lazy<ITransactionRepository> _transactionRepository = new(() => new TransactionRepository(context));
 
@@ -27,12 +30,16 @@ public class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> logger) : I
     private readonly Lazy<IProjectImagesRepostiory> _projectImagesRepository =
         new(() => new ProjectImagesRepository(context));
     
-    public IUserRepository UserRepository => _userRepository.Value;
+    public ITeamManagerRepository TeamManagerRepository => _teamManagerRepository.Value;
+    public IOrganizationManagerRepository OrganizationManagerRepository => _organizationManagerRepository.Value;
+
+    // public IUserRepository UserRepository => _userRepository.Value;
+
     public IProjectRepository ProjectRepository => _projectRepository.Value;
     public IRequirementRepository RequirementRepository => _requirementRepository.Value;
     public ICategoryRepository CategoryRepository => _categoryRepository.Value;
-    public IUserSkillsRepository UserSkillsRepository => _userSkillsRepository.Value;
-    public ISkillRepository SkillRepository => _skillRepository.Value;
+    // public IUserSkillsRepository UserSkillsRepository => _userSkillsRepository.Value;
+    // public ISkillRepository SkillRepository => _skillRepository.Value;
     public IProjectImagesRepostiory ProjectImagesRepository => _projectImagesRepository.Value;
     public ITransactionRepository TransactionRepository => _transactionRepository.Value;
 

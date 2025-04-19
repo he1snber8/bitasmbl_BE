@@ -9,11 +9,13 @@ public class UserSocialLinkConfiguration : IEntityTypeConfiguration<UserSocialLi
     public void Configure(EntityTypeBuilder<UserSocialLink> builder)
     {
         builder.HasKey(pi => new { pi.Id }); // Composite key
+        
         builder.HasIndex(pi => new { pi.Id, pi.UserId, pi.SocialUrl }).IsUnique();
 
         builder.HasOne(pi => pi.User)
             .WithMany(u => u.UserSocials)
-            .HasForeignKey(pi => pi.UserId);
+            .HasForeignKey(us => us.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(c => c.SocialUrl)
             .HasColumnType("varchar")

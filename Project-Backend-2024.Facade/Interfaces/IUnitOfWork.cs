@@ -3,10 +3,12 @@
 public interface IUnitOfWork
 {
     IProjectRepository ProjectRepository { get; }
-    IUserSkillsRepository UserSkillsRepository { get; }
-    ISkillRepository SkillRepository { get; }
+    // IUserSkillsRepository UserSkillsRepository { get; }
+    // ISkillRepository SkillRepository { get; }
     // IProjectApplicationRepository ProjectApplicationRepository { get; }
-    IUserRepository UserRepository { get; }
+    // IUserRepository UserRepository { get; }
+    ITeamManagerRepository TeamManagerRepository { get; }
+    IOrganizationManagerRepository OrganizationManagerRepository { get; }
     
     ICategoryRepository CategoryRepository { get; }
     IRequirementRepository RequirementRepository { get; }

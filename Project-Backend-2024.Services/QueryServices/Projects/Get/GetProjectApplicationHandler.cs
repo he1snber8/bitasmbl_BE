@@ -10,14 +10,17 @@ namespace Project_Backend_2024.Services.QueryServices.Projects.Get;
 public class GetProjectApplicationHandler(IProjectRepository repository, IMapper mapper)
     : IRequestHandler<GetProjectApplications, List<GetProjectApplicationModel>?>
 {
-    public async Task<List<GetProjectApplicationModel>?> Handle(GetProjectApplications request, CancellationToken cancellationToken)
+    public async Task<List<GetProjectApplicationModel>?> Handle(GetProjectApplications request,
+        CancellationToken cancellationToken)
     {
-        var project = await repository.Set(p => p.Id == request.Id).Include(p => p.ProjectApplications).ThenInclude(p => p.Applicant).FirstOrDefaultAsync(cancellationToken);
+        var project = await repository.Set(p => p.Id == request.Id)
+            .Include(p => p.ProjectApplications)
+            .ThenInclude(p => p.Project).FirstOrDefaultAsync(cancellationToken);
 
         if (project is null) throw new ArgumentNullException(nameof(project), "Could not find project");
 
         var projectApplicationModels = mapper.Map<List<GetProjectApplicationModel>>(project.ProjectApplications);
-        
+
         return projectApplicationModels;
     }
 }

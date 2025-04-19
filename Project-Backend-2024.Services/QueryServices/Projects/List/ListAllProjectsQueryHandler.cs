@@ -29,10 +29,10 @@ public class ListAllProjectsQueryHandler(
         var userId = httpContextAccessor.HttpContext.User.Claims
             .FirstOrDefault(c => c.Type == "Id")?.Value;
 
-        IQueryable<Project> query = projectRepository.Set().Include(p => p.ProjectImages)
+        IQueryable<Project> query = projectRepository.Set() //Include(p => p.ProjectImages)
             // .Where(p => p.PrincipalId != userId)
-            .Include(p => p.User)
-            .ThenInclude(u => u.UserSocials)
+            .Include(p => p)
+            .ThenInclude(u => u.User)
             .OrderByDescending(p => p.DateCreated);
 
         if (userId is not null)
@@ -52,7 +52,7 @@ public class ListAllProjectsQueryHandler(
             {
                 project.Requirements = await FetchRequirementsAsync(project.Id, cancellationToken);
                 project.Categories = await FetchCategoriesAsync(project.Id, cancellationToken);
-                project.ProjectLinks = await FetchLinksAsync(project.Id, cancellationToken);
+                // project.ProjectLinks = await FetchLinksAsync(project.Id, cancellationToken);
             }
         }
 
@@ -90,15 +90,15 @@ public class ListAllProjectsQueryHandler(
             .ToListAsync(cancellationToken);
     }
     
-    private async Task<List<ProjectLinkModel?>> FetchLinksAsync(int projectId, CancellationToken cancellationToken)
-    {
-        var links = await projectRepository.Set().Where(p => p.Id == projectId)
-            .SelectMany(pl => pl.ProjectLinks)
-            .Where(pl => pl.ProjectId == projectId)
-            .ToListAsync(cancellationToken);
-        
-        var linkModels = mapper.Map<List<ProjectLinkModel?>>(links);
-
-        return linkModels;
-    }
+    // private async Task<List<ProjectLinkModel?>> FetchLinksAsync(int projectId, CancellationToken cancellationToken)
+    // {
+    //     var links = await projectRepository.Set().Where(p => p.Id == projectId)
+    //         .SelectMany(pl => pl.ProjectLinks)
+    //         .Where(pl => pl.ProjectId == projectId)
+    //         .ToListAsync(cancellationToken);
+    //     
+    //     var linkModels = mapper.Map<List<ProjectLinkModel?>>(links);
+    //
+    //     return linkModels;
+    // }
 }

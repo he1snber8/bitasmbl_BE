@@ -14,7 +14,7 @@ namespace Project_Backend_2024.Services.QueryServices.Users.Get;
 public class GetUserProfileQueryHandler(
     UserManager<User> userManager,
     IMapper mapper,
-    IUserRepository userRepository,
+    ITeamManagerRepository userRepository,
     IHttpContextAccessor httpContextAccessor) : IRequestHandler<GetUserProfileQuery, GetUserProfileModel>
 {
     public async Task<GetUserProfileModel> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
@@ -22,20 +22,16 @@ public class GetUserProfileQueryHandler(
         var userId = httpContextAccessor.HttpContext?.User?.Claims
             .FirstOrDefault(c => c.Type == "Id")?.Value ?? throw new UserNotFoundException();
 
-        var user = await userManager.Users
-            .Where(u => u.Id == userId)
-            .Include(u => u.Projects)
-            .ThenInclude(p => p.ProjectApplications)
-            .ThenInclude(pa => pa.Applicant)
+        var user = await userRepository
+            .Set(u => u.Id == userId)
             .Include(u => u.UserSocials)
             .SingleOrDefaultAsync(cancellationToken) ?? throw new UserNotFoundException();
 
         var userModel = mapper.Map<GetUserProfileModel>(user);
 
-        userModel.Skills =
-            mapper.Map<List<GetSkillsModel>>
-            (user.UserSkills.Where(us => us.UserId == userId)
-                .Select(a => a.Skill).ToList());
+        // userModel.Skills =
+        //     mapper.Map<List<GetSkillsModel>>
+        //         (user.UserRequirementSkills.Where(us => us.User.Id == userId));
         
         return userModel;
     }

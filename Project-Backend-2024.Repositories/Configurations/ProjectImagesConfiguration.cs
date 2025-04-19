@@ -10,9 +10,9 @@ public class ProjectImagesConfiguration : IEntityTypeConfiguration<ProjectImage>
     {
         builder.HasKey(pi => new {pi.ProjectId, pi.ImageUrl});
         
-        builder.HasOne(pi => pi.Project)
-            .WithMany(p => p.ProjectImages)
-            .HasForeignKey(pi => pi.ProjectId);
+        // builder.HasOne(pi => pi.Project)
+        //     .WithMany(p => p.ProjectImages)
+        //     .HasForeignKey(pi => pi.ProjectId);
 
         builder.Property(c => c.ImageUrl)
             .HasColumnType("varchar(2048)");
